@@ -3,6 +3,9 @@ import 'package:test/test.dart';
 
 void main() {
   group('$AcanthisUnion', () {
+    test("Can be created using `const`", () {
+      const AcanthisUnion([]);
+    });
     test(
         'when creating a union validator with a string and a number,'
         'and the value is a string, '

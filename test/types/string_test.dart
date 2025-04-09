@@ -4,6 +4,10 @@ import 'package:test/test.dart';
 
 void main() {
   group('$AcanthisString', () {
+    test("Can be created using `const`", () {
+      const AcanthisString();
+    });
+
     test(
         'when creating a string validator,'
         'and the string is valid, '
