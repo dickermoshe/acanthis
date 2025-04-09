@@ -168,13 +168,13 @@ abstract class AcanthisType<O> {
 @immutable
 abstract class BaseAcanthisCheck<O> extends AcanthisOperation<O> {
   /// The error message of the check
-  final String error;
+  String get error;
 
   /// The name of the check
   final String name;
 
   /// The constructor of the class
-  const BaseAcanthisCheck({required this.error, required this.name});
+  const BaseAcanthisCheck({required this.name});
 
   /// The function to check the value
   bool onCheck(O toTest);
@@ -196,9 +196,12 @@ class AcanthisCheck<O> extends BaseAcanthisCheck<O> {
   /// The function to check the value
   final bool Function(O value) onCheckCallback;
 
+  @override
+  final String error;
+
   /// The constructor of the class
   const AcanthisCheck(
-      {super.error = '',
+      {this.error = '',
       super.name = '',
       required bool Function(O value) onCheck})
       : onCheckCallback = onCheck;
@@ -211,13 +214,13 @@ class AcanthisCheck<O> extends BaseAcanthisCheck<O> {
 @immutable
 abstract class BaseAcanthisAsyncCheck<O> extends AcanthisOperation<O> {
   /// The error message of the check
-  final String error;
+  String get error;
 
   /// The name of the check
   final String name;
 
   /// The constructor of the class
-  const BaseAcanthisAsyncCheck({required this.error, required this.name});
+  const BaseAcanthisAsyncCheck({required this.name});
 
   /// The function to check the value
   Future<bool> onCheck(O toTest);
@@ -239,9 +242,12 @@ class AcanthisAsyncCheck<O> extends BaseAcanthisAsyncCheck<O> {
   /// The function to check the value asynchronously
   final Future<bool> Function(O value) onCheckCallback;
 
+  @override
+  final String error;
+
   /// The constructor of the class
   const AcanthisAsyncCheck(
-      {super.error = '',
+      {this.error = '',
       super.name = '',
       required Future<bool> Function(O value) onCheck})
       : onCheckCallback = onCheck;

@@ -57,7 +57,6 @@ AcanthisBoolean boolean() => AcanthisBoolean();
 
 abstract class BooleanChecks extends BaseAcanthisCheck<bool> {
   const BooleanChecks({
-    required super.error,
     required super.name,
   });
   static const isTrue = _IsTrueCheck();
@@ -67,21 +66,23 @@ abstract class BooleanChecks extends BaseAcanthisCheck<bool> {
 class _IsTrueCheck extends BooleanChecks {
   const _IsTrueCheck()
       : super(
-          error: 'Value must be true',
           name: 'isTrue',
         );
 
   @override
   bool onCheck(bool toTest) => toTest;
+  @override
+  String get error => 'Value must be true';
 }
 
 class _IsFalseCheck extends BooleanChecks {
   const _IsFalseCheck()
       : super(
-          error: 'Value must be false',
           name: 'isFalse',
         );
 
   @override
   bool onCheck(bool toTest) => !toTest;
+  @override
+  String get error => 'Value must be false';
 }

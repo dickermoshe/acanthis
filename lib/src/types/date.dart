@@ -63,7 +63,6 @@ AcanthisDate date() => AcanthisDate();
 
 abstract class DateChecks extends BaseAcanthisCheck<DateTime> {
   const DateChecks({
-    required super.error,
     required super.name,
   });
   const factory DateChecks.min(DateTime value) = _DateMinCheck;
@@ -77,11 +76,12 @@ class _DateMinCheck extends DateChecks {
 
   const _DateMinCheck(this.value)
       : super(
-          error: 'The date must be greater than or equal to $value',
           name: 'min',
         );
   @override
   bool onCheck(DateTime toTest) => toTest.compareTo(value) >= 0;
+  @override
+  String get error => 'The date must be greater than or equal to $value';
 }
 
 class _DateMaxCheck extends DateChecks {
@@ -89,11 +89,12 @@ class _DateMaxCheck extends DateChecks {
 
   const _DateMaxCheck(this.value)
       : super(
-          error: 'The date must be less than or equal to $value',
           name: 'max',
         );
   @override
   bool onCheck(DateTime toTest) => toTest.compareTo(value) <= 0;
+  @override
+  String get error => 'The date must be less than or equal to $value';
 }
 
 class _DateDifferenceCheck extends DateChecks {
@@ -101,7 +102,6 @@ class _DateDifferenceCheck extends DateChecks {
 
   const _DateDifferenceCheck(this.difference)
       : super(
-          error: 'The date must differ from now by $difference or more',
           name: 'differsFromNow',
         );
 
@@ -109,4 +109,7 @@ class _DateDifferenceCheck extends DateChecks {
   bool onCheck(DateTime toTest) {
     return toTest.difference(DateTime.now()).abs() >= difference;
   }
+
+  @override
+  String get error => 'The date must differ from now by $difference or more';
 }
