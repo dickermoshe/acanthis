@@ -8,7 +8,7 @@ import 'nullable.dart';
 @immutable
 abstract class AcanthisType<O> {
   /// The operations that the type should perform
-  final IList operations;
+  final IList<AcanthisOperation> operations;
 
   final bool isAsync;
 
