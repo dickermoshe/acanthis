@@ -4,6 +4,9 @@ import 'package:acanthis/acanthis.dart' as acanthis;
 
 void main() {
   group('$AcanthisList', () {
+    test("Can be created using `const`", () {
+      const AcanthisList(AcanthisDate());
+    });
     test(
         'when creating a list validator,'
         'and the list is valid, '

@@ -3,6 +3,9 @@ import 'package:test/test.dart';
 
 void main() {
   group('$AcanthisBoolean', () {
+    test("Can be created using `const`", () {
+      const AcanthisBoolean();
+    });
     test(
         'when creating a boolean validator, '
         'and the value is true, '

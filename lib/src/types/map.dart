@@ -2,6 +2,8 @@ import 'dart:collection';
 
 import 'package:acanthis/src/exceptions/async_exception.dart';
 import 'package:acanthis/src/types/nullable.dart';
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:meta/meta.dart';
 
 import '../exceptions/validation_error.dart';
 import 'list.dart';
@@ -9,17 +11,30 @@ import 'types.dart';
 
 /// A class to validate map types
 class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
-  Map<String, AcanthisType> _fields;
+  final IMap<String, AcanthisType> _fields;
+  Map<String, AcanthisType> get fields => UnmodifiableMapView(_fields.unlock);
 
-  Map<String, AcanthisType> get fields => UnmodifiableMapView(_fields);
+  final bool _passthrough;
+  final IList<_Dependency> _dependencies;
+  final IList<String> _optionalFields;
 
-  bool _passthrough = false;
-  final List<_Dependency> _dependencies = [];
-  final List<String> _optionalFields = [];
-
-  AcanthisMap(
+  const AcanthisMap(
     this._fields,
-  );
+  )   : _passthrough = false,
+        _dependencies = const IList.empty(),
+        _optionalFields = const IList.empty();
+
+  AcanthisMap._({
+    required IMap<String, AcanthisType<dynamic>> fields,
+    required bool passthrough,
+    required IList<_Dependency> dependencies,
+    required IList<String> optionalFields,
+    super.isAsync,
+    super.operations,
+  })  : _fields = fields,
+        _passthrough = passthrough,
+        _dependencies = dependencies,
+        _optionalFields = optionalFields;
 
   Map<String, V> _parse(Map<String, V> value) {
     final parsed = <String, V>{};
@@ -249,8 +264,14 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
   ///
   /// The optionals are valid only for the current layer of the object
   AcanthisMap<V> optionals(List<String> fields) {
-    _optionalFields.addAll(fields);
-    return this;
+    return AcanthisMap<V>._(
+      fields: _fields,
+      passthrough: _passthrough,
+      dependencies: _dependencies,
+      optionalFields: _optionalFields.addAll(fields),
+      operations: operations,
+      isAsync: isAsync,
+    );
   }
 
   /// Override of [parse] from [AcanthisType]
@@ -305,8 +326,15 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
     required String dependendsOn,
     required bool Function(dynamic, dynamic) dependency,
   }) {
-    _dependencies.add(_Dependency(dependent, dependendsOn, dependency));
-    return this;
+    return AcanthisMap<V>._(
+      fields: _fields,
+      passthrough: _passthrough,
+      dependencies:
+          _dependencies.add(_Dependency(dependent, dependendsOn, dependency)),
+      optionalFields: _optionalFields,
+      operations: operations,
+      isAsync: isAsync,
+    );
   }
 
   bool _recursiveSuccess(Map<String, dynamic> errors) {
@@ -321,15 +349,20 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
 
   /// Add field(s) to the map
   AcanthisMap<V> extend(Map<String, AcanthisType> fields) {
-    _fields.addAll(fields);
-    return this;
+    return AcanthisMap<V>._(
+      fields: _fields.addAll(fields.toIMap()),
+      passthrough: _passthrough,
+      dependencies: _dependencies,
+      optionalFields: _optionalFields,
+      operations: operations,
+      isAsync: isAsync,
+    );
   }
 
   /// Merge field(s) to the map
   /// if a field already exists, it will be overwritten
   AcanthisMap<V> merge(Map<String, AcanthisType> fields) {
-    _fields = {..._fields, ...fields};
-    return this;
+    return extend(fields);
   }
 
   /// Pick field(s) from the map
@@ -340,8 +373,14 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
         newFields[field] = _fields[field]!;
       }
     }
-    _fields = newFields;
-    return this;
+    return AcanthisMap<V>._(
+      fields: newFields.toIMap(),
+      passthrough: _passthrough,
+      dependencies: _dependencies,
+      optionalFields: _optionalFields,
+      operations: operations,
+      isAsync: isAsync,
+    );
   }
 
   /// Omit field(s) from the map
@@ -352,14 +391,26 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
         newFields[field] = _fields[field]!;
       }
     }
-    _fields = newFields;
-    return this;
+    return AcanthisMap<V>._(
+      fields: newFields.toIMap(),
+      passthrough: _passthrough,
+      dependencies: _dependencies,
+      optionalFields: _optionalFields,
+      operations: operations,
+      isAsync: isAsync,
+    );
   }
 
   /// Allow unknown keys in the map
   AcanthisMap<V> passthrough() {
-    _passthrough = true;
-    return this;
+    return AcanthisMap<V>._(
+      fields: _fields,
+      passthrough: true,
+      dependencies: _dependencies,
+      optionalFields: _optionalFields,
+      operations: operations,
+      isAsync: isAsync,
+    );
   }
 
   AcanthisMap<V?> partial({bool deep = false}) {
@@ -377,25 +428,67 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
     return AcanthisMap<V?>(
         _fields.map((key, value) => MapEntry(key, value.nullable())));
   }
+
+  @override
+  AcanthisMap<V> withAsyncCheck(AcanthisAsyncCheck<Map<String, V>> check) {
+    return AcanthisMap<V>._(
+      fields: _fields,
+      passthrough: _passthrough,
+      dependencies: _dependencies,
+      optionalFields: _optionalFields,
+      operations: operations.add(check),
+      isAsync: true,
+    );
+  }
+
+  @override
+  AcanthisMap<V> withCheck(AcanthisCheck<Map<String, V>> check) {
+    return AcanthisMap<V>._(
+      fields: _fields,
+      passthrough: _passthrough,
+      dependencies: _dependencies,
+      optionalFields: _optionalFields,
+      operations: operations.add(check),
+      isAsync: isAsync,
+    );
+  }
+
+  @override
+  AcanthisMap<V> withTransformation(
+      AcanthisTransformation<Map<String, V>> transformation) {
+    return AcanthisMap<V>._(
+      fields: _fields,
+      passthrough: _passthrough,
+      dependencies: _dependencies,
+      optionalFields: _optionalFields,
+      operations: operations.add(transformation),
+      isAsync: isAsync,
+    );
+  }
 }
 
 /// Create a map of [fields]
 AcanthisMap object(Map<String, AcanthisType> fields) => AcanthisMap<dynamic>(
-      fields,
+      fields.toIMap(),
     );
 
+@immutable
 class _Dependency {
   final String dependent;
   final String dependendsOn;
   final bool Function(dynamic, dynamic) dependency;
 
-  _Dependency(this.dependent, this.dependendsOn, this.dependency);
+  const _Dependency(this.dependent, this.dependendsOn, this.dependency);
 }
 
 class LazyEntry extends AcanthisType<dynamic> {
   final AcanthisType Function(AcanthisMap parent) _type;
 
-  LazyEntry(this._type);
+  const LazyEntry(
+    this._type, {
+    super.operations,
+    super.isAsync,
+  });
 
   AcanthisType call(AcanthisMap parent) {
     final type = _type(parent);
@@ -408,6 +501,31 @@ class LazyEntry extends AcanthisType<dynamic> {
   @override
   AcanthisNullable nullable({defaultValue}) {
     throw UnimplementedError('The implementation must be done from the parent');
+  }
+
+  @override
+  LazyEntry withAsyncCheck(AcanthisAsyncCheck check) {
+    return LazyEntry(
+      _type,
+      operations: operations.add(check),
+      isAsync: true,
+    );
+  }
+
+  @override
+  LazyEntry withCheck(AcanthisCheck check) {
+    return LazyEntry(
+      _type,
+      operations: operations.add(check),
+    );
+  }
+
+  @override
+  LazyEntry withTransformation(AcanthisTransformation transformation) {
+    return LazyEntry(
+      _type,
+      operations: operations.add(transformation),
+    );
   }
 }
 

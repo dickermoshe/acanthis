@@ -1,18 +1,20 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:meta/meta.dart';
 import '../exceptions/async_exception.dart';
 import '../exceptions/validation_error.dart';
 import 'nullable.dart';
 
 /// A class to validate types
+@immutable
 abstract class AcanthisType<O> {
   /// The operations that the type should perform
-  final List<AcanthisOperation> operations = [];
+  final IList<AcanthisOperation> operations;
 
-  bool _isAsync = false;
-
-  bool get isAsync => _isAsync;
+  final bool isAsync;
 
   /// The constructor of the class
-  AcanthisType();
+  const AcanthisType(
+      {this.operations = const IList.empty(), this.isAsync = false});
 
   /// The parse method to parse the value
   /// it returns a [AcanthisParseResult] with the parsed value and throws a [ValidationError] if the value is not valid
@@ -113,15 +115,10 @@ abstract class AcanthisType<O> {
   }
 
   /// Add a check to the type
-  void addCheck(AcanthisCheck<O> check) {
-    operations.add(check);
-  }
+  AcanthisType<O> withCheck(AcanthisCheck<O> check);
 
   /// Add an async check to the type
-  void addAsyncCheck(AcanthisAsyncCheck<O> check) {
-    _isAsync = true;
-    operations.add(check);
-  }
+  AcanthisType<O> withAsyncCheck(AcanthisAsyncCheck<O> check);
 
   /// Make the type nullable
   AcanthisNullable nullable({O? defaultValue}) {
@@ -133,8 +130,8 @@ abstract class AcanthisType<O> {
       {required bool Function(O value) onCheck,
       required String error,
       required String name}) {
-    addCheck(AcanthisCheck<O>(onCheck: onCheck, error: error, name: name));
-    return this;
+    return withCheck(
+        AcanthisCheck<O>(onCheck: onCheck, error: error, name: name));
   }
 
   /// Add a custom async check to the number
@@ -142,9 +139,8 @@ abstract class AcanthisType<O> {
       {required Future<bool> Function(O value) onCheck,
       required String error,
       required String name}) {
-    addAsyncCheck(
+    return withAsyncCheck(
         AcanthisAsyncCheck<O>(onCheck: onCheck, error: error, name: name));
-    return this;
   }
 
   /// Add a pipe transformation to the type to transform the value to another type
@@ -156,19 +152,17 @@ abstract class AcanthisType<O> {
   }
 
   /// Add a transformation to the type
-  void addTransformation(AcanthisTransformation<O> transformation) {
-    operations.add(transformation);
-  }
+  AcanthisType<O> withTransformation(AcanthisTransformation<O> transformation);
 
   /// Add a typed transformation to the type. It does not transform the value if the type is not the same
   AcanthisType<O> transform(O Function(O value) transformation) {
-    addTransformation(
+    return withTransformation(
         AcanthisTransformation<O>(transformation: transformation));
-    return this;
   }
 }
 
 /// A class that represents a check operation
+@immutable
 class AcanthisCheck<O> extends AcanthisOperation<O> {
   /// The function to check the value
   final bool Function(O value) onCheck;
@@ -194,6 +188,7 @@ class AcanthisCheck<O> extends AcanthisOperation<O> {
 }
 
 /// A class that represents an async check operation
+@immutable
 class AcanthisAsyncCheck<O> extends AcanthisOperation<O> {
   /// The function to check the value asynchronously
   final Future<bool> Function(O value) onCheck;
@@ -219,6 +214,7 @@ class AcanthisAsyncCheck<O> extends AcanthisOperation<O> {
 }
 
 /// A class that represents a transformation operation
+@immutable
 class AcanthisTransformation<O> extends AcanthisOperation<O> {
   /// The transformation function
   final O Function(O value) transformation;
@@ -234,6 +230,7 @@ class AcanthisTransformation<O> extends AcanthisOperation<O> {
 }
 
 /// A class that represents an operation
+@immutable
 abstract class AcanthisOperation<O> {
   /// The constructor of the class
   const AcanthisOperation();
@@ -242,6 +239,7 @@ abstract class AcanthisOperation<O> {
   dynamic call(O value);
 }
 
+@immutable
 class AcanthisPipeline<O, T> {
   final AcanthisType<O> inType;
 
@@ -249,7 +247,7 @@ class AcanthisPipeline<O, T> {
 
   final T Function(O value) transform;
 
-  AcanthisPipeline(
+  const AcanthisPipeline(
       {required this.inType, required this.outType, required this.transform});
 
   AcanthisParseResult parse(O value) {
@@ -320,6 +318,7 @@ class AcanthisPipeline<O, T> {
 }
 
 /// A class to represent the result of a parse operation
+@immutable
 class AcanthisParseResult<O> {
   /// The value of the parsing
   final O value;
