@@ -7,7 +7,7 @@ import '../exceptions/validation_error.dart';
 class AcanthisUnion extends AcanthisType<dynamic> {
   final List<AcanthisType> elements;
 
-  AcanthisUnion(this.elements);
+  const AcanthisUnion(this.elements, {super.operations, super.isAsync});
 
   /// override of the [parse] method from [AcanthisType]
   @override
@@ -49,6 +49,31 @@ class AcanthisUnion extends AcanthisType<dynamic> {
       return element.nullable(defaultValue: defaultValue);
     }
     return AcanthisNullable(this, defaultValue: defaultValue);
+  }
+
+  @override
+  AcanthisUnion withAsyncCheck(AcanthisAsyncCheck check) {
+    return AcanthisUnion(
+      elements,
+      operations: operations.add(check),
+      isAsync: true,
+    );
+  }
+
+  @override
+  AcanthisUnion withCheck(AcanthisCheck check) {
+    return AcanthisUnion(
+      elements,
+      operations: operations.add(check),
+    );
+  }
+
+  @override
+  AcanthisUnion withTransformation(AcanthisTransformation transformation) {
+    return AcanthisUnion(
+      elements,
+      operations: operations.add(transformation),
+    );
   }
 }
 

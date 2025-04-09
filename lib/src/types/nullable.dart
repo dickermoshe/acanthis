@@ -8,7 +8,8 @@ class AcanthisNullable<T> extends AcanthisType<T?> {
   /// The element of the nullable
   final AcanthisType<T> element;
 
-  AcanthisNullable(this.element, {this.defaultValue});
+  const AcanthisNullable(this.element,
+      {this.defaultValue, super.operations, super.isAsync});
 
   /// override of the [parse] method from [AcanthisType]
   @override
@@ -57,5 +58,26 @@ class AcanthisNullable<T> extends AcanthisType<T?> {
   @override
   AcanthisNullable nullable({T? defaultValue}) {
     return this;
+  }
+
+  @override
+  AcanthisNullable<T> withAsyncCheck(AcanthisAsyncCheck<T?> check) {
+    return AcanthisNullable(element,
+        defaultValue: defaultValue,
+        operations: operations.add(check),
+        isAsync: true);
+  }
+
+  @override
+  AcanthisNullable<T> withCheck(AcanthisCheck<T?> check) {
+    return AcanthisNullable(element,
+        defaultValue: defaultValue, operations: operations.add(check));
+  }
+
+  @override
+  AcanthisNullable<T> withTransformation(
+      AcanthisTransformation<T?> transformation) {
+    return AcanthisNullable(element,
+        defaultValue: defaultValue, operations: operations.add(transformation));
   }
 }

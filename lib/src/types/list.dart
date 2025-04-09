@@ -4,11 +4,9 @@ import 'types.dart';
 
 /// A class to validate list types
 class AcanthisList<T> extends AcanthisType<List<T>> {
-  AcanthisType<T> element;
+  final AcanthisType<T> element;
 
-  AcanthisList(
-    this.element,
-  );
+  const AcanthisList(this.element, {super.operations, super.isAsync});
 
   List<T> _parse(List<T> value) {
     final parsed = <T>[];
@@ -95,58 +93,78 @@ class AcanthisList<T> extends AcanthisType<List<T>> {
 
   /// Add a check to the list to check if it is at least [length] elements long
   AcanthisList<T> min(int length) {
-    addCheck(AcanthisCheck<List<T>>(
+    return withCheck(AcanthisCheck<List<T>>(
         onCheck: (toTest) => toTest.length >= length,
         error: 'The list must have at least $length elements',
         name: 'min'));
-    return this;
   }
 
   /// Add a check to the list to check if it contains at least one of the [values]
   AcanthisList<T> anyOf(List<T> values) {
-    addCheck(AcanthisCheck<List<T>>(
+    return withCheck(AcanthisCheck<List<T>>(
         onCheck: (toTest) => toTest.any((element) => values.contains(element)),
         error: 'The list must have at least one of the values in $values',
         name: 'anyOf'));
-    return this;
   }
 
   /// Add a check to the list to check if it contains all of the [values]
   AcanthisList<T> everyOf(List<T> values) {
-    addCheck(AcanthisCheck<List<T>>(
+    return withCheck(AcanthisCheck<List<T>>(
         onCheck: (toTest) =>
             toTest.every((element) => values.contains(element)),
         error: 'The list must have all of the values in $values',
         name: 'allOf'));
-    return this;
   }
 
   /// Add a check to the list to check if it is at most [length] elements long
   AcanthisList<T> max(int length) {
-    addCheck(AcanthisCheck<List<T>>(
+    return withCheck(AcanthisCheck<List<T>>(
         onCheck: (toTest) => toTest.length <= length,
         error: 'The list must have at most $length elements',
         name: 'max'));
-    return this;
   }
 
   /// Add a check to the list to check if all elements are unique
   ///
   /// In Zod is the same as creating a set.
   AcanthisList<T> unique() {
-    addCheck(AcanthisCheck<List<T>>(
+    return withCheck(AcanthisCheck<List<T>>(
         onCheck: (toTest) => toTest.toSet().length == toTest.length,
         error: 'The list must have unique elements',
         name: 'unique'));
-    return this;
   }
 
   /// Add a check to the list to check if it has exactly [value] elements
   AcanthisList<T> length(int value) {
-    addCheck(AcanthisCheck<List<T>>(
+    return withCheck(AcanthisCheck<List<T>>(
         onCheck: (toTest) => toTest.length == value,
         error: 'The list must have exactly $value elements',
         name: 'length'));
-    return this;
+  }
+
+  @override
+  AcanthisList<T> withAsyncCheck(AcanthisAsyncCheck<List<T>> check) {
+    return AcanthisList(
+      element,
+      operations: operations.add(check),
+      isAsync: true,
+    );
+  }
+
+  @override
+  AcanthisList<T> withCheck(AcanthisCheck<List<T>> check) {
+    return AcanthisList(
+      element,
+      operations: operations.add(check),
+    );
+  }
+
+  @override
+  AcanthisList<T> withTransformation(
+      AcanthisTransformation<List<T>> transformation) {
+    return AcanthisList(
+      element,
+      operations: operations.add(transformation),
+    );
   }
 }
