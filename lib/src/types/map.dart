@@ -347,7 +347,7 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
     return results.every((element) => element);
   }
 
-    /// Add field(s) to the map
+  /// Add field(s) to the map
   /// It won't overwrite existing fields
   AcanthisMap<V> extend(Map<String, AcanthisType> fields) {
     final newFields = <String, AcanthisType>{};
