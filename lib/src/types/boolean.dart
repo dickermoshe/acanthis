@@ -10,18 +10,12 @@ class AcanthisBoolean extends AcanthisType<bool> {
 
   /// Add a check to the boolean to check if it is true
   AcanthisBoolean isTrue() {
-    return withCheck(AcanthisCheck<bool>(
-        onCheck: (value) => value,
-        error: 'Value must be true',
-        name: 'isTrue'));
+    return withCheck(BooleanChecks.isTrue);
   }
 
   /// Add a check to the boolean to check if it is false
   AcanthisBoolean isFalse() {
-    return withCheck(AcanthisCheck<bool>(
-        onCheck: (value) => !value,
-        error: 'Value must be false',
-        name: 'isFalse'));
+    return withCheck(BooleanChecks.isFalse);
   }
 
   /// Create a list of booleans
@@ -35,7 +29,7 @@ class AcanthisBoolean extends AcanthisType<bool> {
   }
 
   @override
-  AcanthisBoolean withAsyncCheck(AcanthisAsyncCheck<bool> check) {
+  AcanthisBoolean withAsyncCheck(BaseAcanthisAsyncCheck<bool> check) {
     return AcanthisBoolean(
       operations: operations.add(check),
       isAsync: true,
@@ -43,7 +37,7 @@ class AcanthisBoolean extends AcanthisType<bool> {
   }
 
   @override
-  AcanthisBoolean withCheck(AcanthisCheck<bool> check) {
+  AcanthisBoolean withCheck(BaseAcanthisCheck<bool> check) {
     return AcanthisBoolean(
       operations: operations.add(check),
     );
@@ -51,7 +45,7 @@ class AcanthisBoolean extends AcanthisType<bool> {
 
   @override
   AcanthisBoolean withTransformation(
-      AcanthisTransformation<bool> transformation) {
+      BaseAcanthisTransformation<bool> transformation) {
     return AcanthisBoolean(
       operations: operations.add(transformation),
     );
@@ -60,3 +54,34 @@ class AcanthisBoolean extends AcanthisType<bool> {
 
 /// Create a boolean validator
 AcanthisBoolean boolean() => AcanthisBoolean();
+
+abstract class BooleanChecks extends BaseAcanthisCheck<bool> {
+  const BooleanChecks({
+    required super.error,
+    required super.name,
+  });
+  static const isTrue = _IsTrueCheck();
+  static const isFalse = _IsFalseCheck();
+}
+
+class _IsTrueCheck extends BooleanChecks {
+  const _IsTrueCheck()
+      : super(
+          error: 'Value must be true',
+          name: 'isTrue',
+        );
+
+  @override
+  bool onCheck(bool toTest) => toTest;
+}
+
+class _IsFalseCheck extends BooleanChecks {
+  const _IsFalseCheck()
+      : super(
+          error: 'Value must be false',
+          name: 'isFalse',
+        );
+
+  @override
+  bool onCheck(bool toTest) => !toTest;
+}
