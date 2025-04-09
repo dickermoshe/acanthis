@@ -49,12 +49,12 @@ class AcanthisNumber extends AcanthisType<num> {
 
   /// Add a check to the number to check if it is an integer
   AcanthisNumber integer() {
-    return withCheck(NumericChecks.intCheck);
+    return withCheck(NumericChecks.int);
   }
 
   /// Add a check to the number to check if it is a double
   AcanthisNumber double() {
-    return withCheck(NumericChecks.doubleCheck);
+    return withCheck(NumericChecks.double);
   }
 
   /// Add a check to the number to check if it is a multiple of [value]
@@ -64,17 +64,17 @@ class AcanthisNumber extends AcanthisType<num> {
 
   /// Add a check to the number to check if it is finite
   AcanthisNumber finite() {
-    return withCheck(NumericChecks.isFinite);
+    return withCheck(NumericChecks.finite);
   }
 
   /// Add a check to the number to check if it is infinite
   AcanthisNumber infinite() {
-    return withCheck(NumericChecks.isInfinite);
+    return withCheck(NumericChecks.infinite);
   }
 
   /// Add a check to the number to check if it is "not a number"
   AcanthisNumber nan() {
-    return withCheck(NumericChecks.isNaN);
+    return withCheck(NumericChecks.nan);
   }
 
   /// Add a check to the number to check if it is not "not a number"
@@ -132,11 +132,11 @@ abstract class NumericChecks extends BaseAcanthisCheck<num> {
   const factory NumericChecks.multipleOf(num value) = _MultipleOfCheck;
   static const positive = _PositiveCheck();
   static const negative = _NegativeCheck();
-  static const intCheck = _IntCheck();
-  static const doubleCheck = _DoubleCheck();
-  static const isFinite = _IsFiniteCheck();
-  static const isInfinite = _IsInfiniteCheck();
-  static const isNaN = _IsNaNCheck();
+  static const int = _IntCheck();
+  static const double = _DoubleCheck();
+  static const finite = _IsFiniteCheck();
+  static const infinite = _IsInfiniteCheck();
+  static const nan = _IsNaNCheck();
   static const notNaN = _IsNotNaNCheck();
 }
 

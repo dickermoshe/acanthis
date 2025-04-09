@@ -103,7 +103,7 @@ class AcanthisString extends AcanthisType<String> {
   }
 
   AcanthisString hexColor() {
-    return withCheck(StringChecks.hexCode);
+    return withCheck(StringChecks.hexColor);
   }
 
   /// Add a check to the string to check if it is a valid uri
@@ -300,7 +300,7 @@ abstract class StringChecks extends BaseAcanthisCheck<String> {
   static const nanoid = _NanoidCheck();
   static const jwt = _JwtCheck();
   static const base64 = _Base64Check();
-  static const hexCode = _HexCodeCheck();
+  static const hexColor = _HexCodeCheck();
   static const url = _UrlCheck();
   static const card = _CardCheck();
   static const uncompromised = _UncompromisedCheck();
