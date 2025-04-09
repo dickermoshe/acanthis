@@ -162,6 +162,7 @@ abstract class AcanthisType<O> {
 }
 
 /// A class that represents a check operation
+@immutable
 class AcanthisCheck<O> extends AcanthisOperation<O> {
   /// The function to check the value
   final bool Function(O value) onCheck;
@@ -187,6 +188,7 @@ class AcanthisCheck<O> extends AcanthisOperation<O> {
 }
 
 /// A class that represents an async check operation
+@immutable
 class AcanthisAsyncCheck<O> extends AcanthisOperation<O> {
   /// The function to check the value asynchronously
   final Future<bool> Function(O value) onCheck;
@@ -212,6 +214,7 @@ class AcanthisAsyncCheck<O> extends AcanthisOperation<O> {
 }
 
 /// A class that represents a transformation operation
+@immutable
 class AcanthisTransformation<O> extends AcanthisOperation<O> {
   /// The transformation function
   final O Function(O value) transformation;
@@ -227,6 +230,7 @@ class AcanthisTransformation<O> extends AcanthisOperation<O> {
 }
 
 /// A class that represents an operation
+@immutable
 abstract class AcanthisOperation<O> {
   /// The constructor of the class
   const AcanthisOperation();
@@ -235,6 +239,7 @@ abstract class AcanthisOperation<O> {
   dynamic call(O value);
 }
 
+@immutable
 class AcanthisPipeline<O, T> {
   final AcanthisType<O> inType;
 
@@ -313,6 +318,7 @@ class AcanthisPipeline<O, T> {
 }
 
 /// A class to represent the result of a parse operation
+@immutable
 class AcanthisParseResult<O> {
   /// The value of the parsing
   final O value;

@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:acanthis/src/exceptions/async_exception.dart';
 import 'package:acanthis/src/types/nullable.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:meta/meta.dart';
 
 import '../exceptions/validation_error.dart';
 import 'list.dart';
@@ -17,7 +18,7 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
   final IList<_Dependency> _dependencies;
   final IList<String> _optionalFields;
 
-  AcanthisMap(
+  const AcanthisMap(
     this._fields,
   )   : _passthrough = false,
         _dependencies = const IList.empty(),
@@ -471,12 +472,13 @@ AcanthisMap object(Map<String, AcanthisType> fields) => AcanthisMap<dynamic>(
       fields.toIMap(),
     );
 
+@immutable
 class _Dependency {
   final String dependent;
   final String dependendsOn;
   final bool Function(dynamic, dynamic) dependency;
 
-  _Dependency(this.dependent, this.dependendsOn, this.dependency);
+  const _Dependency(this.dependent, this.dependendsOn, this.dependency);
 }
 
 class LazyEntry extends AcanthisType<dynamic> {
