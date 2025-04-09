@@ -143,6 +143,18 @@ void main() {
       expect(resultParse.success, true);
     });
 
+        test(
+        'when creating a map validator with the extend property, '
+        'and the new field is already in the map, '
+        'then it should be ignored', () {
+      final map = acanthis
+          .object({'key': acanthis.string().min(5).max(20)}).extend(
+              {'key': acanthis.string().max(1)});
+
+      final result = map.fields['key']?.parse('value');
+      expect(result?.success, true);
+    });
+
     test(
         'when creating a map validator with the extend property, '
         'and the parse value does not contain a validated key, '
