@@ -498,6 +498,7 @@ abstract class StringChecks extends BaseAcanthisCheck<String> {
     final response = await request.close();
     final body = await response.transform(convert.utf8.decoder).join();
     final lines = body.split('\n');
+    client.close();
     return !lines.any((element) => element.startsWith(hexString.substring(5)));
   }
 
@@ -531,7 +532,7 @@ class _MaxCheck extends StringChecks {
   @override
   String get error => 'Value must be at most $length characters long';
   @override
-  String get name => 'maxLength';
+  String get name => 'max';
 }
 
 class _PatternCheck extends StringChecks {
