@@ -491,7 +491,7 @@ void main() {
       @NumericChecks.gt(5)
       @NumericChecks.lte(10)
       @NumericChecks.gte(5)
-      @NumericTansforms.pow(5)
+      @NumericTransforms.pow(5)
 
       // ignore: unused_local_variable
           final a = 1;

@@ -91,7 +91,7 @@ class AcanthisNumber extends AcanthisType<num> {
 
   /// Transform the number to a power of [value]
   AcanthisNumber pow(num value) {
-    return withTransformation(NumericTansforms.pow(value));
+    return withTransformation(NumericTransforms.pow(value));
   }
 
   /// Create a union from the number
@@ -247,12 +247,12 @@ class _BetweenCheck extends NumericChecks {
   String get name => 'between';
 }
 
-abstract class NumericTansforms extends BaseAcanthisTransformation<num> {
-  const NumericTansforms();
-  const factory NumericTansforms.pow(num value) = _PowerTransformation;
+abstract class NumericTransforms extends BaseAcanthisTransformation<num> {
+  const NumericTransforms();
+  const factory NumericTransforms.pow(num value) = _PowerTransformation;
 }
 
-class _PowerTransformation extends NumericTansforms {
+class _PowerTransformation extends NumericTransforms {
   final num exponent;
   const _PowerTransformation(this.exponent);
 
