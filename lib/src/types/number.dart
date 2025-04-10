@@ -1,4 +1,6 @@
 import 'dart:math' as math;
+import 'dart:core' as core;
+import 'dart:core';
 
 import 'list.dart';
 import 'types.dart';
@@ -118,9 +120,7 @@ class AcanthisNumber extends AcanthisType<num> {
 AcanthisNumber number() => AcanthisNumber();
 
 abstract class NumericChecks extends BaseAcanthisCheck<num> {
-  const NumericChecks({
-    required super.name,
-  });
+  const NumericChecks();
 
   const factory NumericChecks.lte(num value) = _LteCheck;
   const factory NumericChecks.gte(num value) = _GteCheck;
@@ -129,187 +129,122 @@ abstract class NumericChecks extends BaseAcanthisCheck<num> {
   const factory NumericChecks.between({required num min, required num max}) =
       _BetweenCheck;
   const factory NumericChecks.multipleOf(num value) = _MultipleOfCheck;
-  static const positive = _PositiveCheck();
-  static const negative = _NegativeCheck();
-  static const int = _IntCheck();
-  static const double = _DoubleCheck();
-  static const finite = _IsFiniteCheck();
-  static const infinite = _IsInfiniteCheck();
-  static const nan = _IsNaNCheck();
-  static const notNaN = _IsNotNaNCheck();
+
+  static bool _positiveCheck(num toTest) => toTest > 0;
+  static const positive = AcanthisCheck<num>(
+      onCheck: _positiveCheck,
+      name: "positive",
+      error: 'Value must be positive');
+  static bool _negativeCheck(num toTest) => toTest < 0;
+
+  static const negative = AcanthisCheck<num>(
+      onCheck: _negativeCheck,
+      error: 'Value must be negative',
+      name: 'negative');
+
+  static bool _isIntegerCheck(num toTest) => toTest is core.int;
+  static const int = AcanthisCheck<num>(
+      onCheck: _isIntegerCheck,
+      error: 'Value must be an integer',
+      name: 'integer');
+
+  static bool _isDoubleCheck(num toTest) => toTest is core.double;
+  static const double = AcanthisCheck<num>(
+      onCheck: _isDoubleCheck, error: 'Value must be a double', name: 'double');
+
+  static bool _finiteCheck(num toTest) => toTest.isFinite;
+  static const finite = AcanthisCheck<num>(
+      onCheck: _finiteCheck, error: 'Value is not finite', name: 'finite');
+
+  static bool _isInfiniteCheck(num toTest) => toTest.isInfinite;
+  static const infinite = AcanthisCheck<num>(
+      onCheck: _isInfiniteCheck,
+      error: 'Value is not infinite',
+      name: 'infinite');
+
+  static bool _isNaNCheck(num toTest) => toTest.isNaN;
+  static const nan = AcanthisCheck<num>(
+      onCheck: _isNaNCheck, error: 'Value is not NaN', name: 'nan');
+
+  static bool _isNotNaNCheck(num toTest) => !toTest.isNaN;
+  static const notNaN = AcanthisCheck<num>(
+      onCheck: _isNotNaNCheck, error: 'Value is NaN', name: 'notNaN');
 }
 
 class _LteCheck extends NumericChecks {
   final num value;
-  const _LteCheck(this.value) : super(name: 'lte');
+  const _LteCheck(this.value);
 
   @override
   bool onCheck(num toTest) => toTest <= value;
 
   @override
   String get error => 'Value must be less than or equal to $value';
+  @override
+  String get name => 'lte';
 }
 
 class _GteCheck extends NumericChecks {
   final num value;
-  const _GteCheck(this.value)
-      : super(
-          name: 'gte',
-        );
+  const _GteCheck(this.value);
 
   @override
   bool onCheck(num toTest) => toTest >= value;
 
   @override
   String get error => 'Value must be greater than or equal to $value';
+  @override
+  String get name => 'gte';
 }
 
 class _GtCheck extends NumericChecks {
   final num value;
-  const _GtCheck(this.value)
-      : super(
-          name: 'gt',
-        );
+  const _GtCheck(this.value);
 
   @override
   bool onCheck(num toTest) => toTest > value;
 
   @override
   String get error => 'Value must be greater than $value';
+  @override
+  String get name => 'gt';
 }
 
 class _LtCheck extends NumericChecks {
   final num value;
-  const _LtCheck(this.value)
-      : super(
-          name: 'lt',
-        );
+  const _LtCheck(this.value);
 
   @override
   bool onCheck(num toTest) => toTest < value;
   @override
   String get error => 'Value must be less than $value';
+  @override
+  String get name => 'lt';
+}
+
+class _MultipleOfCheck extends NumericChecks {
+  final num value;
+  const _MultipleOfCheck(this.value);
+
+  @override
+  bool onCheck(num toTest) => toTest % value == 0;
+  @override
+  String get error => 'Value must be a multiple of $value';
+  @override
+  String get name => 'multipleOf';
 }
 
 class _BetweenCheck extends NumericChecks {
   final num min;
   final num max;
-  const _BetweenCheck({required this.min, required this.max})
-      : super(
-          name: 'between',
-        );
+  const _BetweenCheck({required this.min, required this.max});
 
   @override
   bool onCheck(num toTest) => toTest >= min && toTest <= max;
   @override
   String get error => 'Value must be between $min and $max';
-}
-
-class _PositiveCheck extends NumericChecks {
-  const _PositiveCheck()
-      : super(
-          name: 'positive',
-        );
-
   @override
-  bool onCheck(num toTest) => toTest > 0;
-  @override
-  String get error => 'Value must be positive';
-}
-
-class _NegativeCheck extends NumericChecks {
-  const _NegativeCheck()
-      : super(
-          name: 'negative',
-        );
-
-  @override
-  bool onCheck(num toTest) => toTest < 0;
-  @override
-  String get error => 'Value must be negative';
-}
-
-class _IntCheck extends NumericChecks {
-  const _IntCheck()
-      : super(
-          name: 'integer',
-        );
-
-  @override
-  bool onCheck(num toTest) => toTest is int;
-  @override
-  String get error => 'Value must be an integer';
-}
-
-class _DoubleCheck extends NumericChecks {
-  const _DoubleCheck()
-      : super(
-          name: 'double',
-        );
-
-  @override
-  bool onCheck(num toTest) => toTest is double;
-  @override
-  String get error => 'Value must be a double';
-}
-
-class _MultipleOfCheck extends NumericChecks {
-  final num value;
-
-  const _MultipleOfCheck(
-    this.value,
-  ) : super(
-          name: 'multipleOf',
-        );
-
-  @override
-  bool onCheck(num toTest) => toTest % value == 0;
-
-  @override
-  String get error => 'Value must be a multiple of $value';
-}
-
-class _IsFiniteCheck extends NumericChecks {
-  const _IsFiniteCheck()
-      : super(
-          name: 'isFinite',
-        );
-
-  @override
-  bool onCheck(num toTest) => toTest.isFinite;
-  @override
-  String get error => 'Value must be finite';
-}
-
-class _IsInfiniteCheck extends NumericChecks {
-  const _IsInfiniteCheck()
-      : super(
-          name: 'isInfinite',
-        );
-
-  @override
-  bool onCheck(num toTest) => toTest.isInfinite;
-  @override
-  String get error => 'Value must be infinite';
-}
-
-class _IsNaNCheck extends NumericChecks {
-  const _IsNaNCheck() : super(name: 'nan');
-
-  @override
-  bool onCheck(num toTest) => toTest.isNaN;
-  @override
-  String get error => 'Value is NaN';
-}
-
-class _IsNotNaNCheck extends NumericChecks {
-  const _IsNotNaNCheck() : super(name: 'notNaN');
-
-  @override
-  bool onCheck(num toTest) => !toTest.isNaN;
-
-  @override
-  String get error => 'Value is not NaN';
+  String get name => 'between';
 }
 
 abstract class NumericTansforms extends BaseAcanthisTransformation<num> {

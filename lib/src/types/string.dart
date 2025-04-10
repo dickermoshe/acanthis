@@ -260,546 +260,212 @@ const _base64Regex =
 const _timeRegex = r'^([0-1]?[0-9]|2[0-3]):[0-5][0-9](?::([0-5]\d))?$';
 
 abstract class StringChecks extends BaseAcanthisCheck<String> {
-  const StringChecks({
-    required super.name,
-  });
+  const StringChecks();
 
-  static const email = _EmailCheck();
   const factory StringChecks.min(int length) = _MinCheck;
   const factory StringChecks.max(int length) = _MaxCheck;
   const factory StringChecks.pattern(RegExp pattern) = _PatternCheck;
-  static const letters = _LettersCheck();
-  static const strictLetters = _StrictLettersCheck();
-  static const digits = _DigitsCheck();
-  static const strictDigits = _StrictDigitsCheck();
-  static const alphanumeric = _AlphanumericCheck();
-  static const strictAlphanumeric = _StrictAlphanumericCheck();
-  static const alphanumericWithSpaces = _AlphanumericWithSpacesCheck();
-  static const strictAlphanumericWithSpaces =
-      _StrictAlphanumericWithSpacesCheck();
-  static const specialCharacters = _SpecialCharactersCheck();
-  static const strictSpecialCharacters = _StrictSpecialCharactersCheck();
-  static const allCharacters = _AllCharactersCheck();
-  static const strictAllCharacters = _StrictAllCharactersCheck();
-  static const upperCase = _UppercaseCheck();
-  static const lowerCase = _LowercaseCheck();
-  static const mixedCase = _MixedcaseCheck();
-  static const dateTime = _DatetimeCheck();
-  static const time = _TimeCheck();
-  static const uri = _UriCheck();
-  static const required = _RequiredCheck();
   const factory StringChecks.length(int length) = _LengthCheck;
   const factory StringChecks.contains(String value) = _ContainsCheck;
-  const factory StringChecks.startsWith(String value) = _StartswithCheck;
-  const factory StringChecks.endsWith(String value) = _EndswithCheck;
-  static const cuid = _CuidCheck();
-  static const cuid2 = _Cuid2Check();
-  static const ulid = _UlidCheck();
-  static const uuid = _UuidCheck();
-  static const nanoid = _NanoidCheck();
-  static const jwt = _JwtCheck();
-  static const base64 = _Base64Check();
-  static const hexColor = _HexCodeCheck();
-  static const url = _UrlCheck();
-  static const card = _CardCheck();
-  static const uncompromised = _UncompromisedCheck();
-}
+  const factory StringChecks.startsWith(String value) = _StartsWithCheck;
+  const factory StringChecks.endsWith(String value) = _EndsWithCheck;
 
-class _EmailCheck extends StringChecks {
-  const _EmailCheck()
-      : super(
-          name: 'email',
-        );
+  static const email = AcanthisCheck<String>(
+      onCheck: EmailValidator.validate,
+      error: 'Invalid email format',
+      name: 'email');
 
-  @override
-  bool onCheck(String toTest) => EmailValidator.validate(toTest);
+  static bool _letterCheck(String toTest) => RegExp(_letters).hasMatch(toTest);
+  static const letters = AcanthisCheck<String>(
+      onCheck: _letterCheck,
+      error: 'Value must contain letters',
+      name: 'letters');
 
-  @override
-  String get error => 'Invalid email format';
-}
+  static bool _strictLetterCheck(String toTest) =>
+      RegExp(_lettersStrict).hasMatch(toTest);
+  static const strictLetters = AcanthisCheck<String>(
+      onCheck: _strictLetterCheck,
+      error: 'Value must contain only letters',
+      name: 'letters');
 
-class _MinCheck extends StringChecks {
-  final int length;
-  const _MinCheck(this.length)
-      : super(
-          name: 'min',
-        );
+  static bool _digitCheck(String toTest) => RegExp(_digits).hasMatch(toTest);
+  static const digits = AcanthisCheck<String>(
+      onCheck: _digitCheck, error: 'Value must contain digits', name: 'digits');
 
-  @override
-  bool onCheck(String toTest) => toTest.length >= length;
-  @override
-  String get error => 'Value must be at least $length characters long';
-}
+  static bool _strictDigitCheck(String toTest) =>
+      RegExp(_digitsStrict).hasMatch(toTest);
+  static const strictDigits = AcanthisCheck<String>(
+      onCheck: _strictDigitCheck,
+      error: 'Value must contain only digits',
+      name: 'digits');
 
-class _MaxCheck extends StringChecks {
-  final int length;
+  static bool _alphanumericCheck(String toTest) =>
+      RegExp(_alphanumeric).hasMatch(toTest);
+  static const alphanumeric = AcanthisCheck<String>(
+      onCheck: _alphanumericCheck,
+      error: 'Value must contain alphanumeric characters',
+      name: 'alphanumeric');
 
-  const _MaxCheck(
-    this.length,
-  ) : super(
-          name: 'maxLength',
-        );
+  static bool _strictAlphanumericCheck(String toTest) =>
+      RegExp(_alphanumericStrict).hasMatch(toTest);
+  static const strictAlphanumeric = AcanthisCheck<String>(
+      onCheck: _strictAlphanumericCheck,
+      error: 'Value must contain only alphanumeric characters',
+      name: 'alphanumeric');
 
-  @override
-  bool onCheck(String toTest) => toTest.length <= length;
-  @override
-  String get error => 'Value must be at most $length characters long';
-}
-
-class _PatternCheck extends StringChecks {
-  final RegExp pattern;
-  const _PatternCheck(
-    this.pattern,
-  ) : super(
-          name: 'pattern',
-        );
-
-  @override
-  bool onCheck(String toTest) => pattern.hasMatch(toTest);
-  @override
-  String get error => 'Value does not match the pattern $pattern';
-}
-
-class _LettersCheck extends StringChecks {
-  const _LettersCheck()
-      : super(
-          name: 'letters',
-        );
-
-  @override
-  bool onCheck(String toTest) => RegExp(_letters).hasMatch(toTest);
-
-  @override
-  String get error => 'Value must contain letters';
-}
-
-class _StrictLettersCheck extends StringChecks {
-  const _StrictLettersCheck()
-      : super(
-          name: 'letters',
-        );
-
-  @override
-  bool onCheck(String toTest) => RegExp(_lettersStrict).hasMatch(toTest);
-  @override
-  String get error => 'Value must contain only letters';
-}
-
-class _DigitsCheck extends StringChecks {
-  const _DigitsCheck()
-      : super(
-          name: 'digits',
-        );
-
-  @override
-  bool onCheck(String toTest) => RegExp(_digits).hasMatch(toTest);
-  @override
-  String get error => 'Value must contain digits';
-}
-
-class _StrictDigitsCheck extends StringChecks {
-  const _StrictDigitsCheck()
-      : super(
-          name: 'digits',
-        );
-
-  @override
-  bool onCheck(String toTest) => RegExp(_digitsStrict).hasMatch(toTest);
-
-  @override
-  String get error => 'Value must contain only digits';
-}
-
-class _AlphanumericCheck extends StringChecks {
-  const _AlphanumericCheck()
-      : super(
-          name: 'alphanumeric',
-        );
-
-  @override
-  bool onCheck(String toTest) => RegExp(_alphanumeric).hasMatch(toTest);
-
-  @override
-  String get error => 'Value must contain alphanumeric characters';
-}
-
-class _StrictAlphanumericCheck extends StringChecks {
-  const _StrictAlphanumericCheck()
-      : super(
-          name: 'alphanumeric',
-        );
-
-  @override
-  bool onCheck(String toTest) => RegExp(_alphanumericStrict).hasMatch(toTest);
-
-  @override
-  String get error => 'Value must contain only alphanumeric characters';
-}
-
-class _AlphanumericWithSpacesCheck extends StringChecks {
-  const _AlphanumericWithSpacesCheck()
-      : super(
-          name: 'alphanumericWithSpaces',
-        );
-
-  @override
-  bool onCheck(String toTest) =>
+  static bool _alphanumericWithSpacesCheck(String toTest) =>
       RegExp(_alphanumericWithSpaces).hasMatch(toTest);
+  static const alphanumericWithSpaces = AcanthisCheck<String>(
+      onCheck: _alphanumericWithSpacesCheck,
+      error: 'Value must contain alphanumeric or spaces characters',
+      name: 'alphanumericWithSpaces');
 
-  @override
-  String get error => 'Value must contain alphanumeric or spaces characters';
-}
-
-class _StrictAlphanumericWithSpacesCheck extends StringChecks {
-  const _StrictAlphanumericWithSpacesCheck()
-      : super(
-          name: 'alphanumericWithSpaces',
-        );
-
-  @override
-  bool onCheck(String toTest) =>
+  static bool _strictAlphanumericWithSpacesCheck(String toTest) =>
       RegExp(_alphanumericWithSpacesStrict).hasMatch(toTest);
+  static const strictAlphanumericWithSpaces = AcanthisCheck<String>(
+      onCheck: _strictAlphanumericWithSpacesCheck,
+      error: 'Value must contain only alphanumeric or spaces characters',
+      name: 'alphanumericWithSpaces');
 
-  @override
-  String get error =>
-      'Value must contain only alphanumeric or spaces characters';
-}
+  static bool _specialCharactersCheck(String toTest) =>
+      RegExp(_specialCharacters).hasMatch(toTest);
+  static const specialCharacters = AcanthisCheck<String>(
+      onCheck: _specialCharactersCheck,
+      error: 'Value must contain special characters',
+      name: 'specialCharacters');
 
-class _SpecialCharactersCheck extends StringChecks {
-  const _SpecialCharactersCheck()
-      : super(
-          name: 'specialCharacters',
-        );
-
-  @override
-  bool onCheck(String toTest) => RegExp(_specialCharacters).hasMatch(toTest);
-  @override
-  String get error => 'Value must contain special characters';
-}
-
-class _StrictSpecialCharactersCheck extends StringChecks {
-  const _StrictSpecialCharactersCheck()
-      : super(
-          name: 'specialCharacters',
-        );
-
-  @override
-  bool onCheck(String toTest) =>
+  static bool _strictSpecialCharactersCheck(String toTest) =>
       RegExp(_specialCharactersStrict).hasMatch(toTest);
-  @override
-  String get error => 'Value must contain only special characters';
-}
+  static const strictSpecialCharacters = AcanthisCheck<String>(
+      onCheck: _strictSpecialCharactersCheck,
+      error: 'Value must contain only special characters',
+      name: 'specialCharacters');
 
-class _AllCharactersCheck extends StringChecks {
-  const _AllCharactersCheck()
-      : super(
-          name: 'allCharacters',
-        );
+  static bool _allCharactersCheck(String toTest) =>
+      RegExp(_allCharacters).hasMatch(toTest);
+  static const allCharacters = AcanthisCheck<String>(
+      onCheck: _allCharactersCheck,
+      error: 'Value must contain characters',
+      name: 'allCharacters');
 
-  @override
-  bool onCheck(String toTest) => RegExp(_allCharacters).hasMatch(toTest);
-  @override
-  String get error => 'Value must contain characters';
-}
+  static bool _strictAllCharactersCheck(String toTest) =>
+      RegExp(_allCharactersStrict).hasMatch(toTest);
+  static const strictAllCharacters = AcanthisCheck<String>(
+      onCheck: _strictAllCharactersCheck,
+      error: 'Value must contain only characters',
+      name: 'allCharacters');
 
-class _StrictAllCharactersCheck extends StringChecks {
-  const _StrictAllCharactersCheck()
-      : super(
-          name: 'allCharacters',
-        );
+  static bool _uppercaseCheck(String toTest) => toTest == toTest.toUpperCase();
+  static const upperCase = AcanthisCheck<String>(
+      onCheck: _uppercaseCheck,
+      error: 'Value must be uppercase',
+      name: 'upperCase');
 
-  @override
-  bool onCheck(String toTest) => RegExp(_allCharactersStrict).hasMatch(toTest);
-  @override
-  String get error => 'Value must contain only characters';
-}
+  static bool _lowercaseCheck(String toTest) => toTest == toTest.toLowerCase();
+  static const lowerCase = AcanthisCheck<String>(
+      onCheck: _lowercaseCheck,
+      error: 'Value must be lowercase',
+      name: 'lowerCase');
 
-class _UppercaseCheck extends StringChecks {
-  const _UppercaseCheck()
-      : super(
-          name: 'upperCase',
-        );
-
-  @override
-  bool onCheck(String toTest) => toTest == toTest.toUpperCase();
-  @override
-  String get error => 'Value must be uppercase';
-}
-
-class _LowercaseCheck extends StringChecks {
-  const _LowercaseCheck()
-      : super(
-          name: 'lowerCase',
-        );
-
-  @override
-  bool onCheck(String toTest) => toTest == toTest.toLowerCase();
-  @override
-  String get error => 'Value must be lowercase';
-}
-
-class _MixedcaseCheck extends StringChecks {
-  const _MixedcaseCheck()
-      : super(
-          name: 'mixedCase',
-        );
-
-  @override
-  bool onCheck(String toTest) =>
+  static bool _mixedcaseCheck(String toTest) =>
       toTest != toTest.toUpperCase() && toTest != toTest.toLowerCase();
-  @override
-  String get error => 'Value must be mixed case';
-}
+  static const mixedCase = AcanthisCheck<String>(
+      onCheck: _mixedcaseCheck,
+      error: 'Value must be mixed case',
+      name: 'mixedCase');
 
-class _DatetimeCheck extends StringChecks {
-  const _DatetimeCheck()
-      : super(
-          name: 'dateTime',
-        );
+  static bool _datetimeCheck(String toTest) =>
+      DateTime.tryParse(toTest) != null;
+  static const dateTime = AcanthisCheck<String>(
+      onCheck: _datetimeCheck,
+      error: 'Value must be a valid date time',
+      name: 'dateTime');
 
-  @override
-  bool onCheck(String toTest) => DateTime.tryParse(toTest) != null;
-  @override
-  String get error => 'Value must be a valid date time';
-}
+  static bool _timeCheck(String toTest) =>
+      (RegExp(_timeRegex)).hasMatch(toTest);
+  static const time = AcanthisCheck<String>(
+      onCheck: _timeCheck,
+      error: 'Value must be a valid time format',
+      name: 'time');
 
-class _TimeCheck extends StringChecks {
-  const _TimeCheck()
-      : super(
-          name: 'time',
-        );
+  static bool _uriCheck(String toTest) => Uri.tryParse(toTest) != null;
+  static const uri = AcanthisCheck<String>(
+      onCheck: _uriCheck, error: 'Value must be a valid uri', name: 'uri');
 
-  @override
-  bool onCheck(String toTest) => (RegExp(_timeRegex)).hasMatch(toTest);
-  @override
-  String get error => 'Value must be a valid time format';
-}
+  static bool _requiredCheck(String toTest) => toTest.isNotEmpty;
+  static const required = AcanthisCheck<String>(
+      onCheck: _requiredCheck, error: 'Value is required', name: 'required');
 
-class _UriCheck extends StringChecks {
-  const _UriCheck()
-      : super(
-          name: 'uri',
-        );
-
-  @override
-  bool onCheck(String toTest) => Uri.tryParse(toTest) != null;
-  @override
-  String get error => 'Value must be a valid uri';
-}
-
-class _RequiredCheck extends StringChecks {
-  const _RequiredCheck()
-      : super(
-          name: 'required',
-        );
-
-  @override
-  bool onCheck(String toTest) => toTest.isNotEmpty;
-  @override
-  String get error => 'Value is required';
-}
-
-class _LengthCheck extends StringChecks {
-  final int length;
-  const _LengthCheck(
-    this.length,
-  ) : super(
-          name: 'length',
-        );
-
-  @override
-  bool onCheck(String toTest) => toTest.length == length;
-  @override
-  String get error => 'Value must be $length characters long';
-}
-
-class _ContainsCheck extends StringChecks {
-  final String value;
-  const _ContainsCheck(
-    this.value,
-  ) : super(
-          name: 'contains',
-        );
-
-  @override
-  bool onCheck(String toTest) => toTest.contains(value);
-  @override
-  String get error => 'Value must contain $value';
-}
-
-class _StartswithCheck extends StringChecks {
-  final String value;
-  const _StartswithCheck(
-    this.value,
-  ) : super(
-          name: 'startsWith',
-        );
-
-  @override
-  bool onCheck(String toTest) => toTest.startsWith(value);
-  @override
-  String get error => 'Value must start with $value';
-}
-
-class _EndswithCheck extends StringChecks {
-  final String value;
-  const _EndswithCheck(
-    this.value,
-  ) : super(
-          name: 'endsWith',
-        );
-
-  @override
-  bool onCheck(String toTest) => toTest.endsWith(value);
-  @override
-  String get error => 'Value must end with $value';
-}
-
-class _CuidCheck extends StringChecks {
-  const _CuidCheck()
-      : super(
-          name: 'cuid',
-        );
-
-  @override
-  bool onCheck(String toTest) =>
+  static bool _cuidCheck(String toTest) =>
       RegExp(_cuidRegex, caseSensitive: false).hasMatch(toTest);
-  @override
-  String get error => 'Value must be a valid cuid';
-}
+  static const cuid = AcanthisCheck<String>(
+      onCheck: _cuidCheck, error: 'Value must be a valid cuid', name: 'cuid');
 
-class _Cuid2Check extends StringChecks {
-  const _Cuid2Check()
-      : super(
-          name: 'cuid2',
-        );
-
-  @override
-  bool onCheck(String toTest) =>
+  static bool _cuid2Check(String toTest) =>
       RegExp(_cuid2Regex, caseSensitive: false).hasMatch(toTest);
+  static const cuid2 = AcanthisCheck<String>(
+      onCheck: _cuid2Check,
+      error: 'Value must be a valid cuid2',
+      name: 'cuid2');
 
-  @override
-  String get error => 'Value must be a valid cuid2';
-}
-
-class _UlidCheck extends StringChecks {
-  const _UlidCheck()
-      : super(
-          name: 'ulid',
-        );
-
-  @override
-  bool onCheck(String toTest) =>
+  static bool _ulidCheck(String toTest) =>
       RegExp(_ulidRegex, caseSensitive: false).hasMatch(toTest);
-  @override
-  String get error => 'Value must be a valid ulid';
-}
+  static const ulid = AcanthisCheck<String>(
+      onCheck: _ulidCheck, error: 'Value must be a valid ulid', name: 'ulid');
 
-class _UuidCheck extends StringChecks {
-  const _UuidCheck()
-      : super(
-          name: 'uuid',
-        );
-
-  @override
-  bool onCheck(String toTest) =>
+  static bool _uuidCheck(String toTest) =>
       RegExp(_uuidRegex, caseSensitive: false).hasMatch(toTest);
-  @override
-  String get error => 'Value must be a valid uuid';
-}
+  static const uuid = AcanthisCheck<String>(
+      onCheck: _uuidCheck, error: 'Value must be a valid uuid', name: 'uuid');
 
-class _NanoidCheck extends StringChecks {
-  const _NanoidCheck()
-      : super(
-          name: 'nanoid',
-        );
-
-  @override
-  bool onCheck(String toTest) =>
+  static bool _nanoidCheck(String toTest) =>
       RegExp(_nanoidRegex, caseSensitive: false).hasMatch(toTest);
-  @override
-  String get error => 'Value must be a valid nanoid';
-}
+  static const nanoid = AcanthisCheck<String>(
+      onCheck: _nanoidCheck,
+      error: 'Value must be a valid nanoid',
+      name: 'nanoid');
 
-class _JwtCheck extends StringChecks {
-  const _JwtCheck()
-      : super(
-          name: 'jwt',
-        );
-
-  @override
-  bool onCheck(String toTest) =>
+  static bool _jwtCheck(String toTest) =>
       RegExp(_jwtRegex, caseSensitive: false).hasMatch(toTest);
-  @override
-  String get error => 'Value must be a valid jwt';
-}
+  static const jwt = AcanthisCheck<String>(
+      onCheck: _jwtCheck, error: 'Value must be a valid jwt', name: 'jwt');
 
-class _Base64Check extends StringChecks {
-  const _Base64Check()
-      : super(
-          name: 'base64',
-        );
-
-  @override
-  bool onCheck(String toTest) =>
+  static bool _base64Check(String toTest) =>
       RegExp(_base64Regex, caseSensitive: false).hasMatch(toTest);
-  @override
-  String get error => 'Value must be a valid base64';
-}
+  static const base64 = AcanthisCheck<String>(
+      onCheck: _base64Check,
+      error: 'Value must be a valid base64',
+      name: 'base64');
 
-class _HexCodeCheck extends StringChecks {
-  const _HexCodeCheck()
-      : super(
-          name: 'hexCode',
-        );
-
-  @override
-  bool onCheck(String toTest) {
+  static bool _hexColorCheck(String toTest) {
     if (toTest.length != 7) return false;
     if (toTest[0] != '#') return false;
     return RegExp(r'^[0-9a-fA-F]+$').hasMatch(toTest.substring(1));
   }
 
-  @override
-  String get error => 'Value must be a valid hex code';
-}
+  static const hexColor = AcanthisCheck<String>(
+      onCheck: _hexColorCheck,
+      error: 'Value must be a valid hex color',
+      name: 'hexColor');
 
-class _UrlCheck extends StringChecks {
-  const _UrlCheck()
-      : super(
-          name: 'url',
-        );
-
-  @override
-  bool onCheck(String toTest) {
+  static bool _urlCheck(String toTest) {
     if (toTest.isEmpty) return false;
     final uriValue = Uri.tryParse(toTest);
     if (uriValue == null) return false;
     return uriValue.hasScheme && uriValue.host.isNotEmpty;
   }
 
-  @override
-  String get error => 'Value must be a valid url';
-}
+  static const url = AcanthisCheck<String>(
+      onCheck: _urlCheck, error: 'Value must be a valid url', name: 'url');
 
-class _CardCheck extends StringChecks {
-  const _CardCheck()
-      : super(
-          name: 'card',
-        );
-
-  @override
-  String get error => 'Value must be a valid card number';
-
-  @override
-  bool onCheck(String toTest) {
+  static bool _cardCheck(String toTest) {
     final sanitized = toTest.replaceAll(RegExp(r'\D'), '');
     if (sanitized.length < 13 || sanitized.length > 19) return false;
     if (!RegExp(r'^\d+$').hasMatch(sanitized)) return false;
     return _isValidLuhn(sanitized);
   }
 
-  bool _isValidLuhn(String number) {
+  static bool _isValidLuhn(String number) {
     int sum = 0;
     bool alternate = false;
     for (int i = number.length - 1; i >= 0; i--) {
@@ -815,16 +481,13 @@ class _CardCheck extends StringChecks {
     }
     return sum % 10 == 0;
   }
-}
 
-class _UncompromisedCheck extends BaseAcanthisAsyncCheck<String> {
-  const _UncompromisedCheck()
-      : super(
-          name: 'uncompromised',
-        );
+  static const card = AcanthisCheck<String>(
+      onCheck: _cardCheck,
+      error: 'Value must be a valid card number',
+      name: 'card');
 
-  @override
-  Future<bool> onCheck(toTest) async {
+  static Future<bool> _uncompromisedCheck(String toTest) async {
     final bytes = convert.utf8.encode(toTest);
     final sha = sha1.convert(bytes);
     final hexString = sha.toString().toUpperCase();
@@ -839,56 +502,133 @@ class _UncompromisedCheck extends BaseAcanthisAsyncCheck<String> {
     return !lines.any((element) => element.startsWith(hexString.substring(5)));
   }
 
-  @override
-  String get error => 'Value is compromised';
+  static const uncompromised = AcanthisAsyncCheck<String>(
+      onCheck: _uncompromisedCheck,
+      error: 'Value is compromised',
+      name: 'uncompromised');
 }
 
-/// Numeric transformations
+class _MinCheck extends StringChecks {
+  final int length;
+  const _MinCheck(this.length);
 
-/// String transformations
+  @override
+  bool onCheck(String toTest) => toTest.length >= length;
+  @override
+  String get error => 'Value must be at least $length characters long';
+  @override
+  String get name => 'min';
+}
+
+class _MaxCheck extends StringChecks {
+  final int length;
+
+  const _MaxCheck(
+    this.length,
+  );
+
+  @override
+  bool onCheck(String toTest) => toTest.length <= length;
+  @override
+  String get error => 'Value must be at most $length characters long';
+  @override
+  String get name => 'maxLength';
+}
+
+class _PatternCheck extends StringChecks {
+  final RegExp pattern;
+  const _PatternCheck(
+    this.pattern,
+  );
+
+  @override
+  bool onCheck(String toTest) => pattern.hasMatch(toTest);
+  @override
+  String get error => 'Value does not match the pattern $pattern';
+  @override
+  String get name => 'pattern';
+}
+
+class _LengthCheck extends StringChecks {
+  final int length;
+  const _LengthCheck(
+    this.length,
+  );
+
+  @override
+  bool onCheck(String toTest) => toTest.length == length;
+  @override
+  String get error => 'Value must be $length characters long';
+  @override
+  String get name => 'length';
+}
+
+class _ContainsCheck extends StringChecks {
+  final String value;
+  const _ContainsCheck(
+    this.value,
+  );
+
+  @override
+  bool onCheck(String toTest) => toTest.contains(value);
+  @override
+  String get error => 'Value must contain $value';
+  @override
+  String get name => 'contains';
+}
+
+class _StartsWithCheck extends StringChecks {
+  final String value;
+  const _StartsWithCheck(
+    this.value,
+  );
+
+  @override
+  bool onCheck(String toTest) => toTest.startsWith(value);
+  @override
+  String get error => 'Value must start with $value';
+  @override
+  String get name => 'startsWith';
+}
+
+class _EndsWithCheck extends StringChecks {
+  final String value;
+  const _EndsWithCheck(
+    this.value,
+  );
+
+  @override
+  bool onCheck(String toTest) => toTest.endsWith(value);
+  @override
+  String get error => 'Value must end with $value';
+  @override
+  String get name => 'endsWith';
+}
+
 abstract class StringTransforms extends BaseAcanthisTransformation<String> {
   const StringTransforms();
 
-  static const base64Encode = _StringBase64EncodeTransformation();
-  static const base64Decode = _StringBase64DecodeTransformation();
-  static const toUpperCase = _StringToUpperCaseTransformation();
-  static const toLowerCase = _StringToLowerCaseTransformation();
-  static const trim = _StringTrimTransformation();
-}
-
-class _StringBase64EncodeTransformation extends StringTransforms {
-  const _StringBase64EncodeTransformation();
-
-  @override
-  String transformation(String toTransform) =>
+  static String _base64EncodeTransformation(String toTransform) =>
       convert.base64.encode(toTransform.codeUnits);
-}
+  static const base64Encode =
+      AcanthisTransformation(transformation: _base64EncodeTransformation);
 
-class _StringBase64DecodeTransformation extends StringTransforms {
-  const _StringBase64DecodeTransformation();
-
-  @override
-  String transformation(String toTransform) =>
+  static String _base64DecodeTransformation(String toTransform) =>
       String.fromCharCodes(convert.base64.decode(toTransform));
-}
+  static const base64Decode =
+      AcanthisTransformation(transformation: _base64DecodeTransformation);
 
-class _StringToUpperCaseTransformation extends StringTransforms {
-  const _StringToUpperCaseTransformation();
+  static String _toUpperCaseTransformation(String toTransform) =>
+      toTransform.toUpperCase();
+  static const toUpperCase =
+      AcanthisTransformation(transformation: _toUpperCaseTransformation);
 
-  @override
-  String transformation(String toTransform) => toTransform.toUpperCase();
-}
-
-class _StringToLowerCaseTransformation extends StringTransforms {
-  const _StringToLowerCaseTransformation();
-
-  @override
-  String transformation(String toTransform) => toTransform.toLowerCase();
-}
-
-class _StringTrimTransformation extends StringTransforms {
-  const _StringTrimTransformation();
-
-  @override
-  String transformation(String toTransform) => toTransform.trim();
+  static String _toLowerCaseTransformation(String toTransform) =>
+      toTransform.toLowerCase();
+  static const toLowerCase =
+      AcanthisTransformation(transformation: _toLowerCaseTransformation);
+  static String _stringTrimTransformation(String toTransform) =>
+      toTransform.trim();
+  static const trim =
+      AcanthisTransformation(transformation: _stringTrimTransformation);
 }

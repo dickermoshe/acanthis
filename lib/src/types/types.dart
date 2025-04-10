@@ -171,10 +171,10 @@ abstract class BaseAcanthisCheck<O> extends AcanthisOperation<O> {
   String get error;
 
   /// The name of the check
-  final String name;
+  String get name;
 
   /// The constructor of the class
-  const BaseAcanthisCheck({required this.name});
+  const BaseAcanthisCheck();
 
   /// The function to check the value
   bool onCheck(O toTest);
@@ -199,10 +199,13 @@ class AcanthisCheck<O> extends BaseAcanthisCheck<O> {
   @override
   final String error;
 
+  @override
+  final String name;
+
   /// The constructor of the class
   const AcanthisCheck(
       {this.error = '',
-      super.name = '',
+      this.name = '',
       required bool Function(O value) onCheck})
       : onCheckCallback = onCheck;
 
@@ -217,10 +220,10 @@ abstract class BaseAcanthisAsyncCheck<O> extends AcanthisOperation<O> {
   String get error;
 
   /// The name of the check
-  final String name;
+  String get name;
 
   /// The constructor of the class
-  const BaseAcanthisAsyncCheck({required this.name});
+  const BaseAcanthisAsyncCheck();
 
   /// The function to check the value
   Future<bool> onCheck(O toTest);
@@ -245,10 +248,13 @@ class AcanthisAsyncCheck<O> extends BaseAcanthisAsyncCheck<O> {
   @override
   final String error;
 
+  @override
+  final String name;
+
   /// The constructor of the class
   const AcanthisAsyncCheck(
       {this.error = '',
-      super.name = '',
+      this.name = '',
       required Future<bool> Function(O value) onCheck})
       : onCheckCallback = onCheck;
 

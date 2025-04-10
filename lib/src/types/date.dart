@@ -62,48 +62,48 @@ class AcanthisDate extends AcanthisType<DateTime> {
 AcanthisDate date() => AcanthisDate();
 
 abstract class DateChecks extends BaseAcanthisCheck<DateTime> {
-  const DateChecks({
-    required super.name,
-  });
-  const factory DateChecks.min(DateTime value) = _DateMinCheck;
-  const factory DateChecks.max(DateTime value) = _DateMaxCheck;
+  const DateChecks();
+  const factory DateChecks.min(DateTime value) = _MinCheck;
+  const factory DateChecks.max(DateTime value) = _MaxCheck;
   const factory DateChecks.differsFromNow(Duration difference) =
-      _DateDifferenceCheck;
+      _DifferenceCheck;
 }
 
-class _DateMinCheck extends DateChecks {
+class _MinCheck extends DateChecks {
   final DateTime value;
 
-  const _DateMinCheck(this.value)
-      : super(
-          name: 'min',
-        );
+  const _MinCheck(this.value);
   @override
-  bool onCheck(DateTime toTest) => toTest.compareTo(value) >= 0;
+  bool onCheck(DateTime toTest) =>
+      toTest.isAfter(value) || toTest.isAtSameMomentAs(value);
+
   @override
   String get error => 'The date must be greater than or equal to $value';
+
+  @override
+  String get name => 'min';
 }
 
-class _DateMaxCheck extends DateChecks {
+class _MaxCheck extends DateChecks {
   final DateTime value;
 
-  const _DateMaxCheck(this.value)
-      : super(
-          name: 'max',
-        );
+  const _MaxCheck(this.value);
+
   @override
-  bool onCheck(DateTime toTest) => toTest.compareTo(value) <= 0;
+  bool onCheck(DateTime toTest) =>
+      toTest.isBefore(value) || toTest.isAtSameMomentAs(value);
+
   @override
   String get error => 'The date must be less than or equal to $value';
+
+  @override
+  String get name => 'max';
 }
 
-class _DateDifferenceCheck extends DateChecks {
+class _DifferenceCheck extends DateChecks {
   final Duration difference;
 
-  const _DateDifferenceCheck(this.difference)
-      : super(
-          name: 'differsFromNow',
-        );
+  const _DifferenceCheck(this.difference);
 
   @override
   bool onCheck(DateTime toTest) {
@@ -112,4 +112,7 @@ class _DateDifferenceCheck extends DateChecks {
 
   @override
   String get error => 'The date must differ from now by $difference or more';
+
+  @override
+  String get name => 'differsFromNow';
 }

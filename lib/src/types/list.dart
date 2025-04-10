@@ -153,96 +153,88 @@ class AcanthisList<T> extends AcanthisType<List<T>> {
 // Checks for lists
 
 abstract class ListChecks<T> extends BaseAcanthisCheck<List<T>> {
-  const ListChecks({required super.name});
-  const factory ListChecks.min(int length) = _ListMinCheck<T>;
-  const factory ListChecks.max(int length) = _ListMaxCheck<T>;
-  const factory ListChecks.unique() = _ListUniqueCheck<T>;
-  const factory ListChecks.length(int length) = _ListLengthCheck<T>;
+  const ListChecks();
+  const factory ListChecks.min(int length) = _MinCheck<T>;
+  const factory ListChecks.max(int length) = _MaxCheck<T>;
+  const factory ListChecks.unique() = _UniqueCheck<T>;
+  const factory ListChecks.length(int length) = _LengthCheck<T>;
   const factory ListChecks.everyOf(
     List<T> values,
-  ) = _ListEveryOfCheck<T>;
+  ) = _EveryOfCheck<T>;
   const factory ListChecks.anyOf(
     List<T> values,
-  ) = _ListAnyOfCheck<T>;
+  ) = _AnyOfCheck<T>;
 }
 
-class _ListMinCheck<T> extends ListChecks<T> {
+class _MinCheck<T> extends ListChecks<T> {
   final int length;
 
-  const _ListMinCheck(this.length)
-      : super(
-          name: 'min',
-        );
+  const _MinCheck(this.length);
 
   @override
   bool onCheck(List<T> toTest) => toTest.length >= length;
 
   @override
   String get error => 'The list must have at least $length elements';
+  @override
+  String get name => 'min';
 }
 
-class _ListMaxCheck<T> extends ListChecks<T> {
+class _MaxCheck<T> extends ListChecks<T> {
   final int length;
 
-  const _ListMaxCheck(this.length)
-      : super(
-          name: 'max',
-        );
+  const _MaxCheck(this.length);
 
   @override
   bool onCheck(List<T> toTest) => toTest.length <= length;
   @override
   String get error => 'The list must have at most $length elements';
+  @override
+  String get name => 'max';
 }
 
-class _ListUniqueCheck<T> extends ListChecks<T> {
-  const _ListUniqueCheck()
-      : super(
-          name: 'unique',
-        );
+class _UniqueCheck<T> extends ListChecks<T> {
+  const _UniqueCheck();
 
   @override
   bool onCheck(List<T> toTest) => toTest.toSet().length == toTest.length;
   @override
   String get error => 'The list must have unique elements';
+  @override
+  String get name => 'unique';
 }
 
-class _ListLengthCheck<T> extends ListChecks<T> {
+class _LengthCheck<T> extends ListChecks<T> {
   final int length;
 
-  const _ListLengthCheck(this.length)
-      : super(
-          name: 'length',
-        );
+  const _LengthCheck(this.length);
 
   @override
   bool onCheck(List<T> toTest) => toTest.length == length;
   @override
   String get error => 'The list must have exactly $length elements';
+  @override
+  String get name => 'length';
 }
 
-class _ListEveryOfCheck<T> extends ListChecks<T> {
+class _EveryOfCheck<T> extends ListChecks<T> {
   final List<T> values;
 
-  const _ListEveryOfCheck(this.values)
-      : super(
-          name: 'everyOf',
-        );
+  const _EveryOfCheck(this.values);
 
   @override
   bool onCheck(List<T> toTest) =>
       toTest.every((element) => values.contains(element));
   @override
   String get error => 'The list must have all of the values in $values';
+  @override
+  String get name => 'allOf';
 }
 
-class _ListAnyOfCheck<T> extends ListChecks<T> {
+class _AnyOfCheck<T> extends ListChecks<T> {
   final List<T> values;
 
-  const _ListAnyOfCheck(this.values)
-      : super(
-          name: 'anyOf',
-        );
+  const _AnyOfCheck(this.values);
 
   @override
   bool onCheck(List<T> toTest) =>
@@ -251,4 +243,6 @@ class _ListAnyOfCheck<T> extends ListChecks<T> {
   @override
   String get error =>
       'The list must have at least one of the values in $values';
+  @override
+  String get name => 'anyOf';
 }
