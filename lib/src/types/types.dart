@@ -1,4 +1,5 @@
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'dart:collection';
+
 import 'package:meta/meta.dart';
 import '../exceptions/async_exception.dart';
 import '../exceptions/validation_error.dart';
@@ -7,31 +8,35 @@ import 'nullable.dart';
 /// A class to validate types
 @immutable
 abstract class AcanthisType<O> {
+  // This should not be accessed anywhere else besides for the `operations` getter
+  final List<AcanthisOperation<O>> __operations;
+
   /// The operations that the type should perform
-  final IList<AcanthisOperation> operations;
+  UnmodifiableListView<AcanthisOperation<O>> get operations =>
+      UnmodifiableListView(__operations);
 
   final bool isAsync;
 
   /// The constructor of the class
   const AcanthisType(
-      {this.operations = const IList.empty(), this.isAsync = false});
+      {List<AcanthisOperation<O>> operations = const [], this.isAsync = false})
+      : __operations = operations;
 
   /// The parse method to parse the value
   /// it returns a [AcanthisParseResult] with the parsed value and throws a [ValidationError] if the value is not valid
   AcanthisParseResult<O> parse(O value) {
     if (isAsync) {
-      throw AsyncValidationException(
-          'Cannot use tryParse with async operations');
+      throw AsyncValidationException('Cannot use parse with async operations');
     }
     O newValue = value;
     for (var operation in operations) {
-      if (operation is AcanthisCheck) {
-        if (!operation(newValue)) {
-          throw ValidationError(operation.error);
-        }
-      }
-      if (operation is AcanthisTransformation) {
-        newValue = operation(newValue);
+      switch (operation) {
+        case BaseAcanthisCheck operation:
+          if (!operation(newValue)) {
+            throw ValidationError(operation.error);
+          }
+        case AcanthisTransformation operation:
+          newValue = operation(newValue);
       }
     }
     return AcanthisParseResult(value: newValue);
@@ -51,13 +56,13 @@ abstract class AcanthisType<O> {
     final errors = <String, String>{};
     O newValue = value;
     for (var operation in operations) {
-      if (operation is AcanthisCheck) {
-        if (!operation(newValue)) {
-          errors[operation.name] = operation.error;
-        }
-      }
-      if (operation is AcanthisTransformation) {
-        newValue = operation(newValue);
+      switch (operation) {
+        case BaseAcanthisCheck operation:
+          if (!operation(newValue)) {
+            errors[operation.name] = operation.error;
+          }
+        case AcanthisTransformation operation:
+          newValue = operation(newValue);
       }
     }
     return AcanthisParseResult(
@@ -69,18 +74,20 @@ abstract class AcanthisType<O> {
   Future<AcanthisParseResult<O>> parseAsync(O value) async {
     O newValue = value;
     for (var operation in operations) {
-      if (operation is AcanthisCheck) {
-        if (!operation(newValue)) {
-          throw ValidationError(operation.error);
-        }
-      }
-      if (operation is AcanthisAsyncCheck) {
-        if (!await operation(newValue)) {
-          throw ValidationError(operation.error);
-        }
-      }
-      if (operation is AcanthisTransformation) {
-        newValue = operation(newValue);
+      switch (operation) {
+        case BaseAcanthisCheck operation:
+          if (!operation(newValue)) {
+            throw ValidationError(operation.error);
+          }
+          break;
+        case BaseAcanthisAsyncCheck operation:
+          if (!await operation(newValue)) {
+            throw ValidationError(operation.error);
+          }
+          break;
+        case BaseAcanthisTransformation operation:
+          newValue = operation(newValue);
+          break;
       }
     }
     return AcanthisParseResult(value: newValue);
@@ -96,18 +103,20 @@ abstract class AcanthisType<O> {
     final errors = <String, String>{};
     O newValue = value;
     for (var operation in operations) {
-      if (operation is AcanthisCheck) {
-        if (!operation(newValue)) {
-          errors[operation.name] = operation.error;
-        }
-      }
-      if (operation is AcanthisAsyncCheck) {
-        if (!await operation(newValue)) {
-          errors[operation.name] = operation.error;
-        }
-      }
-      if (operation is AcanthisTransformation) {
-        newValue = operation(newValue);
+      switch (operation) {
+        case BaseAcanthisCheck operation:
+          if (!operation(newValue)) {
+            errors[operation.name] = operation.error;
+          }
+          break;
+        case BaseAcanthisAsyncCheck operation:
+          if (!await operation(newValue)) {
+            errors[operation.name] = operation.error;
+          }
+          break;
+        case BaseAcanthisTransformation operation:
+          newValue = operation(newValue);
+          break;
       }
     }
     return AcanthisParseResult(
@@ -115,10 +124,10 @@ abstract class AcanthisType<O> {
   }
 
   /// Add a check to the type
-  AcanthisType<O> withCheck(AcanthisCheck<O> check);
+  AcanthisType<O> withCheck(BaseAcanthisCheck<O> check);
 
   /// Add an async check to the type
-  AcanthisType<O> withAsyncCheck(AcanthisAsyncCheck<O> check);
+  AcanthisType<O> withAsyncCheck(BaseAcanthisAsyncCheck<O> check);
 
   /// Make the type nullable
   AcanthisNullable nullable({O? defaultValue}) {
@@ -152,7 +161,8 @@ abstract class AcanthisType<O> {
   }
 
   /// Add a transformation to the type
-  AcanthisType<O> withTransformation(AcanthisTransformation<O> transformation);
+  AcanthisType<O> withTransformation(
+      BaseAcanthisTransformation<O> transformation);
 
   /// Add a typed transformation to the type. It does not transform the value if the type is not the same
   AcanthisType<O> transform(O Function(O value) transformation) {
@@ -161,20 +171,31 @@ abstract class AcanthisType<O> {
   }
 }
 
-/// A class that represents a check operation
+/// A base class for creating synchronous check operations.
+///
+/// This class is designed for scenarios where checks need to be
+/// instantiated using `const` constructors. It provides a foundation
+/// for implementing custom validation logic.
+///
+/// In most cases, prefer using the [AcanthisCheck] class unless
+/// you require a more specialized implementation that cannot be
+/// achieved with [AcanthisCheck].
+///
+/// For checks that are executed asynchronously, use the
+/// [BaseAcanthisAsyncCheck] class.
 @immutable
-class AcanthisCheck<O> extends AcanthisOperation<O> {
-  /// The function to check the value
-  final bool Function(O value) onCheck;
-
+abstract class BaseAcanthisCheck<O> extends AcanthisOperation<O> {
   /// The error message of the check
-  final String error;
+  String get error;
 
   /// The name of the check
-  final String name;
+  String get name;
 
   /// The constructor of the class
-  const AcanthisCheck({this.error = '', this.name = '', required this.onCheck});
+  const BaseAcanthisCheck();
+
+  /// The function to check the value
+  bool onCheck(O toTest);
 
   /// The call method to create a Callable class
   @override
@@ -187,45 +208,182 @@ class AcanthisCheck<O> extends AcanthisOperation<O> {
   }
 }
 
-/// A class that represents an async check operation
+/// A class that represents a check operation.
+///
+/// This class is used to encapsulate the logic and data associated with
+/// performing a check operation.
+///
+/// ```dart
+/// final schema = number().withCheck(
+///  AcanthisCheck(
+///    error: 'Value must be a valid email',
+///    name: 'over18',
+///    onCheck: (value) => value > 18,
+/// ));
+/// ```
+///
+/// If you need to create a check that can be used with `const`, you can
+/// use the [BaseAcanthisCheck] class instead.
+///
+/// For checks are executed asynchronously, use the [AcanthisAsyncCheck] class.
 @immutable
-class AcanthisAsyncCheck<O> extends AcanthisOperation<O> {
-  /// The function to check the value asynchronously
-  final Future<bool> Function(O value) onCheck;
+class AcanthisCheck<O> extends BaseAcanthisCheck<O> {
+  /// The function to check the value
+  final bool Function(O value) onCheckCallback;
 
-  /// The error message of the check
+  @override
   final String error;
 
-  /// The name of the check
+  @override
   final String name;
 
   /// The constructor of the class
-  const AcanthisAsyncCheck(
-      {this.error = '', this.name = '', required this.onCheck});
+  const AcanthisCheck(
+      {this.error = '',
+      this.name = '',
+      required bool Function(O value) onCheck})
+      : onCheckCallback = onCheck;
 
+  @override
+  bool onCheck(O toTest) => onCheckCallback(toTest);
+}
+
+/// A base class for creating asynchronous check operations.
+///
+/// This class is designed for scenarios where checks need to be
+/// instantiated using `const` constructors. It provides a foundation
+/// for implementing custom validation logic.
+///
+/// In most cases, prefer using the [AcanthisAsyncCheck] class unless
+/// you require a more specialized implementation that cannot be
+/// achieved with [AcanthisAsyncCheck].
+///
+/// For checks that are executed synchronously, use the
+/// [BaseAcanthisCheck] class.
+@immutable
+abstract class BaseAcanthisAsyncCheck<O> extends AcanthisOperation<O> {
+  /// The error message of the check
+  String get error;
+
+  /// The name of the check
+  String get name;
+
+  /// The constructor of the class
+  const BaseAcanthisAsyncCheck();
+
+  /// The function to check the value
+  Future<bool> onCheck(O toTest);
+
+  /// The call method to create a Callable class
   @override
   Future<bool> call(O value) async {
     try {
-      return await onCheck(value);
+      return onCheck(value);
     } catch (e) {
       return false;
     }
   }
 }
 
-/// A class that represents a transformation operation
+/// A class that represents an asynchronous check operation.
+///
+/// This class is used to encapsulate the logic and data associated with
+/// performing a check operation.
+///
+/// ```dart
+/// final schema = string().url().withCheck(
+///  AcanthisCheck(
+///    error: 'Value must be a working link',
+///    name: 'workingLink',
+///    onCheck: (value) async {
+///    final response = await http.get(Uri.parse(value));
+///    return response.statusCode == 200;
+///   }
+/// ));
+/// ```
+///
+/// If you need to create a check that can be used with `const`, you can
+/// use the [BaseAcanthisCheck] class instead.
+///
+/// For checks are executed asynchronously, use the [AcanthisAsyncCheck] class.
 @immutable
-class AcanthisTransformation<O> extends AcanthisOperation<O> {
-  /// The transformation function
-  final O Function(O value) transformation;
+class AcanthisAsyncCheck<O> extends BaseAcanthisAsyncCheck<O> {
+  /// The function to check the value asynchronously
+  final Future<bool> Function(O value) onCheckCallback;
+
+  @override
+  final String error;
+
+  @override
+  final String name;
 
   /// The constructor of the class
-  const AcanthisTransformation({required this.transformation});
+  const AcanthisAsyncCheck(
+      {this.error = '',
+      this.name = '',
+      required Future<bool> Function(O value) onCheck})
+      : onCheckCallback = onCheck;
+
+  @override
+  Future<bool> onCheck(O toTest) => onCheckCallback(toTest);
+}
+
+/// A base class for creating synchronous check operations.
+///
+/// This class is designed for scenarios where checks need to be
+/// instantiated using `const` constructors. It provides a foundation
+/// for implementing custom validation logic.
+///
+/// In most cases, prefer using the [AcanthisTransformation] class unless
+/// you require a more specialized implementation that cannot be
+/// achieved with [AcanthisTransformation].
+@immutable
+abstract class BaseAcanthisTransformation<O> extends AcanthisOperation<O> {
+  /// The transformation function
+  O transformation(O toTransform);
+
+  /// The constructor of the class
+  const BaseAcanthisTransformation();
 
   /// The call method to create a Callable class
   @override
-  O call(O value) {
-    return transformation(value);
+  O call(O toTransform) {
+    return transformation(toTransform);
+  }
+}
+
+/// A class that represents a transformation operation.
+///
+/// This class is used to encapsulate the logic and data associated with
+/// performing a transformation operation.
+///
+/// ```dart
+/// final schema = number().withTransformation(
+///   AcanthisTransformation(
+///     transformation: (value) => value * 50,
+/// ));
+/// ```
+///
+/// If you need to create a transformation that can be used with `const`, you can
+/// use the [BaseAcanthisTransformation] class instead.
+@immutable
+class AcanthisTransformation<O> extends BaseAcanthisTransformation<O> {
+  /// Callback function to transform the value
+  final O Function(O value) transformationCallback;
+
+  /// The constructor of the class
+  const AcanthisTransformation({required O Function(O value) transformation})
+      : transformationCallback = transformation;
+
+  /// The call method to create a Callable class
+  @override
+  O call(O toTransform) {
+    return transformation(toTransform);
+  }
+
+  @override
+  O transformation(O toTransform) {
+    return transformationCallback(toTransform);
   }
 }
 
