@@ -61,23 +61,24 @@ class AcanthisNullable<T> extends AcanthisType<T?> {
   }
 
   @override
-  AcanthisNullable<T> withAsyncCheck(AcanthisAsyncCheck<T?> check) {
+  AcanthisNullable<T> withAsyncCheck(BaseAcanthisAsyncCheck<T?> check) {
     return AcanthisNullable(element,
         defaultValue: defaultValue,
-        operations: operations.add(check),
+        operations: [...operations, check],
         isAsync: true);
   }
 
   @override
-  AcanthisNullable<T> withCheck(AcanthisCheck<T?> check) {
+  AcanthisNullable<T> withCheck(BaseAcanthisCheck<T?> check) {
     return AcanthisNullable(element,
-        defaultValue: defaultValue, operations: operations.add(check));
+        defaultValue: defaultValue, operations: [...operations, check]);
   }
 
   @override
   AcanthisNullable<T> withTransformation(
-      AcanthisTransformation<T?> transformation) {
+      BaseAcanthisTransformation<T?> transformation) {
     return AcanthisNullable(element,
-        defaultValue: defaultValue, operations: operations.add(transformation));
+        defaultValue: defaultValue,
+        operations: [...operations, transformation]);
   }
 }

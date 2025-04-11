@@ -12,6 +12,7 @@ abstract class AcanthisType<O> {
   final List<AcanthisOperation<O>> __operations;
 
   /// The operations that the type should perform
+  @internal
   UnmodifiableListView<AcanthisOperation<O>> get operations =>
       UnmodifiableListView(__operations);
 
@@ -35,7 +36,7 @@ abstract class AcanthisType<O> {
           if (!operation(newValue)) {
             throw ValidationError(operation.error);
           }
-        case AcanthisTransformation operation:
+        case BaseAcanthisTransformation operation:
           newValue = operation(newValue);
       }
     }
@@ -61,7 +62,7 @@ abstract class AcanthisType<O> {
           if (!operation(newValue)) {
             errors[operation.name] = operation.error;
           }
-        case AcanthisTransformation operation:
+        case BaseAcanthisTransformation operation:
           newValue = operation(newValue);
       }
     }
