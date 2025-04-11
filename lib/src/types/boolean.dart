@@ -5,19 +5,37 @@ import 'types.dart';
 import 'union.dart';
 
 @immutable
-class AcanthisBoolean extends AcanthisType<bool> {
-  const AcanthisBoolean({
+// ignore: camel_case_types
+class boolean extends AcanthisType<bool> {
+  const boolean([
+    AcanthisOperation<bool>? op1,
+    AcanthisOperation<bool>? op2,
+  ]) : super(isNullable: false, op1: op1, op2: op2);
+
+  const boolean.nullable([
+    AcanthisOperation<bool>? op1,
+    AcanthisOperation<bool>? op2,
+  ]) : super(isNullable: true, op1: op1, op2: op2);
+
+  const boolean.withDefault(
+    bool defaultValue, [
+    AcanthisOperation<bool>? op1,
+    AcanthisOperation<bool>? op2,
+  ]) : super(isNullable: false, op1: op1, op2: op2, defaultValue: defaultValue);
+
+  const boolean.raw({
+    super.defaultValue,
+    required super.isNullable,
     super.operations,
-    super.isAsync,
   });
 
   /// Add a check to the boolean to check if it is true
-  AcanthisBoolean isTrue() {
+  boolean isTrue() {
     return withCheck(BooleanChecks.isTrue);
   }
 
   /// Add a check to the boolean to check if it is false
-  AcanthisBoolean isFalse() {
+  boolean isFalse() {
     return withCheck(BooleanChecks.isFalse);
   }
 
@@ -32,31 +50,32 @@ class AcanthisBoolean extends AcanthisType<bool> {
   }
 
   @override
-  AcanthisBoolean withAsyncCheck(BaseAcanthisAsyncCheck<bool> check) {
-    return AcanthisBoolean(
+  boolean withAsyncCheck(BaseAcanthisAsyncCheck<bool> check) {
+    return boolean.raw(
+      isNullable: isNullable,
       operations: [...operations, check],
-      isAsync: true,
+      defaultValue: defaultValue,
     );
   }
 
   @override
-  AcanthisBoolean withCheck(BaseAcanthisCheck<bool> check) {
-    return AcanthisBoolean(
+  boolean withCheck(BaseAcanthisCheck<bool> check) {
+    return boolean.raw(
+      isNullable: isNullable,
       operations: [...operations, check],
+      defaultValue: defaultValue,
     );
   }
 
   @override
-  AcanthisBoolean withTransformation(
-      BaseAcanthisTransformation<bool> transformation) {
-    return AcanthisBoolean(
+  boolean withTransformation(BaseAcanthisTransformation<bool> transformation) {
+    return boolean.raw(
+      isNullable: isNullable,
       operations: [...operations, transformation],
+      defaultValue: defaultValue,
     );
   }
 }
-
-/// Create a boolean validator
-AcanthisBoolean boolean() => AcanthisBoolean();
 
 abstract class BooleanChecks extends BaseAcanthisCheck<bool> {
   const BooleanChecks();

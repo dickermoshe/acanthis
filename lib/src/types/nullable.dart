@@ -3,6 +3,7 @@ import 'package:acanthis/acanthis.dart';
 /// A class to validate nullable types
 class AcanthisNullable<T> extends AcanthisType<T?> {
   /// The default value of the nullable
+  @override
   final T? defaultValue;
 
   /// The element of the nullable
@@ -56,7 +57,7 @@ class AcanthisNullable<T> extends AcanthisType<T?> {
   }
 
   @override
-  AcanthisNullable nullable({T? defaultValue}) {
+  AcanthisNullable isNullable({T? defaultValue}) {
     return this;
   }
 

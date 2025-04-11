@@ -436,13 +436,13 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
           return MapEntry(key, value.partial(deep: deep));
         }
         if (value is LazyEntry) {
-          return MapEntry(key, value.call(this).nullable());
+          return MapEntry(key, value.call(this).isNullable());
         }
-        return MapEntry(key, value.nullable());
+        return MapEntry(key, value.isNullable());
       }));
     }
     return AcanthisMap<V?>(
-        _fields.map((key, value) => MapEntry(key, value.nullable())));
+        _fields.map((key, value) => MapEntry(key, value.isNullable())));
   }
 
   @override
@@ -515,7 +515,7 @@ class LazyEntry extends AcanthisType<dynamic> {
   }
 
   @override
-  AcanthisNullable nullable({defaultValue}) {
+  AcanthisNullable isNullable({defaultValue}) {
     throw UnimplementedError('The implementation must be done from the parent');
   }
 

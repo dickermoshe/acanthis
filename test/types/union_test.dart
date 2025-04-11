@@ -139,7 +139,7 @@ void main() {
         'and use the [or] method to create a union with a number,'
         'and the value is null, '
         'then the result should be successful', () {
-      final u = string().nullable().or([number()]);
+      final u = string().isNullable().or([number()]);
       final result = u.tryParse(null);
 
       expect(result.success, true);

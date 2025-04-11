@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:meta/meta.dart';
 import '../exceptions/async_exception.dart';
 import '../exceptions/validation_error.dart';
@@ -8,20 +6,32 @@ import 'nullable.dart';
 /// A class to validate types
 @immutable
 abstract class AcanthisType<O> {
+  final O? defaultValue;
+  final bool isNullable;
   // This should not be accessed anywhere else besides for the `operations` getter
   final List<AcanthisOperation<O>> __operations;
+  // This should not be accessed anywhere else besides for the `operations` getter
+  final AcanthisOperation<O>? __op1;
+  final AcanthisOperation<O>? __op2;
 
   /// The operations that the type should perform
   @internal
-  UnmodifiableListView<AcanthisOperation<O>> get operations =>
-      UnmodifiableListView(__operations);
+  Iterable<AcanthisOperation<O>> get operations => __operations
+      .followedBy([if (__op1 != null) __op1, if (__op2 != null) __op2]);
 
-  final bool isAsync;
+  bool get isAsync =>
+      operations.any((operation) => operation is BaseAcanthisAsyncCheck);
 
   /// The constructor of the class
-  const AcanthisType(
-      {List<AcanthisOperation<O>> operations = const [], this.isAsync = false})
-      : __operations = operations;
+  const AcanthisType({
+    List<AcanthisOperation<O>> operations = const [],
+    this.defaultValue,
+    AcanthisOperation<O>? op1,
+    AcanthisOperation<O>? op2,
+    required this.isNullable,
+  })  : __operations = operations,
+        __op1 = op1,
+        __op2 = op2;
 
   /// The parse method to parse the value
   /// it returns a [AcanthisParseResult] with the parsed value and throws a [ValidationError] if the value is not valid

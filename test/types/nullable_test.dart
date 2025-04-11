@@ -10,7 +10,7 @@ void main() {
         'when creating a nullable validator on a string,'
         'and the value is not null, '
         'then the result should be successful', () {
-      final nullable = string().nullable();
+      final nullable = string().isNullable();
       final result = nullable.tryParse('This is a test');
 
       expect(result.success, true);
@@ -24,7 +24,7 @@ void main() {
         'when creating a nullable validator on a string,'
         'and the value is null, '
         'then the result should be successful', () {
-      final nullable = string().nullable();
+      final nullable = string().isNullable();
       final result = nullable.tryParse(null);
 
       expect(result.success, true);
@@ -38,7 +38,7 @@ void main() {
         'when creating a nullable validator on a number,'
         'and the value is not null, '
         'then the result should be successful', () {
-      final nullable = number().nullable();
+      final nullable = number().isNullable();
       final result = nullable.tryParse(1);
 
       expect(result.success, true);
@@ -52,7 +52,7 @@ void main() {
         'when creating a nullable validator on a number,'
         'and the value is null, '
         'then the result should be successful', () {
-      final nullable = number().nullable();
+      final nullable = number().isNullable();
       final result = nullable.tryParse(null);
 
       expect(result.success, true);
@@ -66,7 +66,7 @@ void main() {
         'when creating a nullable validator on a date,'
         'and the value is not null, '
         'then the result should be successful', () {
-      final nullable = date().nullable();
+      final nullable = date().isNullable();
       final result = nullable.tryParse(DateTime(2020, 1, 1));
 
       expect(result.success, true);
@@ -80,7 +80,7 @@ void main() {
         'when creating a nullable validator on a date,'
         'and the value is null, '
         'then the result should be successful', () {
-      final nullable = date().nullable();
+      final nullable = date().isNullable();
       final result = nullable.tryParse(null);
 
       expect(result.success, true);
@@ -94,7 +94,7 @@ void main() {
         'when creating a list of nullable strings,'
         'and the value is not null, '
         'then the result should be successful', () {
-      final nullable = string().nullable().list();
+      final nullable = string().isNullable().list();
 
       final result = nullable.tryParse(['This is a test']);
 
@@ -109,7 +109,7 @@ void main() {
         'when creating a list of nullable strings,'
         'and the value is null, '
         'then the result should be successful', () {
-      final nullable = string().nullable().list();
+      final nullable = string().isNullable().list();
 
       final result = nullable.tryParse([null]);
 
@@ -124,7 +124,7 @@ void main() {
         'when creating a nullable list of strings,'
         'and the value is not null, '
         'then the result should be successful', () {
-      final nullable = string().list().nullable();
+      final nullable = string().list().isNullable();
 
       final result = nullable.tryParse(['This is a test']);
 
@@ -139,7 +139,7 @@ void main() {
         'when creating a nullable list of strings,'
         'and the value is null, '
         'then the result should be successful', () {
-      final nullable = string().list().nullable();
+      final nullable = string().list().isNullable();
 
       final result = nullable.tryParse(null);
 
@@ -154,7 +154,7 @@ void main() {
         'when creating a nullable list of nullable strings,'
         'and the value is not null, '
         'then the result should be successful', () {
-      final nullable = string().nullable().list().nullable();
+      final nullable = string().isNullable().list().nullable();
 
       final result = nullable.tryParse(['This is a test']);
 
@@ -169,7 +169,7 @@ void main() {
         'when creating a nullable list of nullable strings,'
         'and the value is null, '
         'then the result should be successful', () {
-      final nullable = string().nullable().list().nullable();
+      final nullable = string().isNullable().list().nullable();
 
       final result = nullable.tryParse(null);
 
@@ -184,7 +184,7 @@ void main() {
         'when creating a nullable map,'
         'and the value is not null, '
         'then the result should be successful', () {
-      final nullable = object({'key': string()}).nullable();
+      final nullable = object({'key': string()}).isNullable();
 
       final result = nullable.tryParse({'key': 'This is a test'});
 
@@ -199,7 +199,7 @@ void main() {
         'when creating a nullable map,'
         'and the value is null, '
         'then the result should be successful', () {
-      final nullable = object({'key': string()}).nullable();
+      final nullable = object({'key': string()}).isNullable();
 
       final result = nullable.tryParse(null);
 
@@ -214,7 +214,7 @@ void main() {
         'when creating a nullable map with nullable values,'
         'and the value is not null, '
         'then the result should be successful', () {
-      final nullable = object({'key': string().nullable()}).nullable();
+      final nullable = object({'key': string().isNullable()}).isNullable();
 
       final result = nullable.tryParse({'key': 'This is a test'});
 
@@ -229,7 +229,7 @@ void main() {
         'when creating a nullable map with nullable values,'
         'and the value is null, '
         'then the result should be successful', () {
-      final nullable = object({'key': string().nullable()}).nullable();
+      final nullable = object({'key': string().isNullable()}).isNullable();
 
       final result = nullable.tryParse(null);
 
@@ -244,7 +244,7 @@ void main() {
         'when creating a nullable map with nullable keys,'
         'and the value is not null, '
         'then the result should be successful', () {
-      final nullable = object({'key': string()}).nullable();
+      final nullable = object({'key': string()}).isNullable();
 
       final result = nullable.tryParse({'key': 'This is a test'});
 
@@ -259,7 +259,7 @@ void main() {
         'when creating a nullable map with nullable keys,'
         'and the value is null, '
         'then the result should be successful', () {
-      final nullable = object({'key': string()}).nullable();
+      final nullable = object({'key': string()}).isNullable();
 
       final result = nullable.tryParse(null);
 
@@ -275,7 +275,7 @@ void main() {
         'and the value is null, '
         'then the result should be successful', () {
       final nullable = object({'key': string()})
-          .nullable(defaultValue: {'key': 'This is a null value'});
+          .isNullable(defaultValue: {'key': 'This is a null value'});
 
       final result = nullable.tryParse(null);
 

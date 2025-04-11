@@ -2,9 +2,9 @@ import 'package:acanthis/acanthis.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('$AcanthisBoolean', () {
+  group('$boolean', () {
     test("Can be created using `const`", () {
-      const AcanthisBoolean();
+      const boolean();
     });
     test(
         'when creating a boolean validator, '
