@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:collection';
 
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:acanthis/src/types/list.dart';
+import 'package:acanthis/src/types/union.dart';
 import 'package:meta/meta.dart';
 import '../exceptions/async_exception.dart';
 import '../exceptions/validation_error.dart';
@@ -8,15 +10,22 @@ import 'nullable.dart';
 
 /// A class to validate types
 @immutable
-abstract class AcanthisType<O> {
+class AcanthisType<O> {
   /// The operations that the type should perform
-  final IList<AcanthisOperation> operations;
+  @internal
+  UnmodifiableListView<AcanthisOperation> get operations =>
+      UnmodifiableListView(__operations);
 
+  final List<AcanthisOperation> __operations;
+
+  @internal
   final bool isAsync;
 
   /// The constructor of the class
+  @internal
   const AcanthisType(
-      {this.operations = const IList.empty(), this.isAsync = false});
+      {List<AcanthisOperation> operations = const [], this.isAsync = false})
+      : __operations = operations;
 
   /// The parse method to parse the value
   /// it returns a [AcanthisParseResult] with the parsed value and throws a [ValidationError] if the value is not valid
@@ -117,10 +126,27 @@ abstract class AcanthisType<O> {
   }
 
   /// Add a check to the type
-  AcanthisType<O> withCheck(BaseAcanthisCheck<O> check);
+  AcanthisType<O> withCheck(BaseAcanthisCheck<O> check) {
+    return AcanthisType(
+      operations: [...operations, check],
+    );
+  }
+
+  /// Add a transformation to the type
+  AcanthisType<O> withTransformation(
+      BaseAcanthisTransformation<O> transformation) {
+    return AcanthisType(
+      operations: [...operations, transformation],
+    );
+  }
 
   /// Add an async check to the type
-  AcanthisType<O> withAsyncCheck(BaseAcanthisAsyncCheck<O> check);
+  AcanthisType<O> withAsyncCheck(BaseAcanthisAsyncCheck<O> check) {
+    return AcanthisType(
+      operations: [...operations, check],
+      isAsync: true,
+    );
+  }
 
   /// Make the type nullable
   AcanthisNullable nullable({O? defaultValue}) {
@@ -153,14 +179,20 @@ abstract class AcanthisType<O> {
     return AcanthisPipeline(inType: this, outType: type, transform: transform);
   }
 
-  /// Add a transformation to the type
-  AcanthisType<O> withTransformation(
-      BaseAcanthisTransformation<O> transformation);
-
   /// Add a typed transformation to the type. It does not transform the value if the type is not the same
   AcanthisType<O> transform(O Function(O value) transformation) {
     return withTransformation(
         AcanthisTransformation<O>(transformation: transformation));
+  }
+
+  /// Make this schema parse a list of elements
+  AcanthisList<O> list() {
+    return AcanthisList(this);
+  }
+
+  /// Create a union from the nullable
+  AcanthisUnion or(List<AcanthisType> elements) {
+    return AcanthisUnion([this, ...elements]);
   }
 }
 

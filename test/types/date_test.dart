@@ -4,9 +4,9 @@ import 'package:test/test.dart';
 import 'package:acanthis/acanthis.dart' as acanthis;
 
 void main() {
-  group('$AcanthisDate', () {
+  group('$AcanthisType<DateTime> ', () {
     test("Can be created using `const`", () {
-      const AcanthisDate();
+      const AcanthisType<DateTime>();
     });
     test(
         'when creating a date validator,'

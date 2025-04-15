@@ -2,25 +2,21 @@ import 'dart:math' as math;
 import 'dart:core' as core;
 import 'dart:core';
 
-import 'list.dart';
 import 'types.dart';
-import 'union.dart';
 
 /// A class to validate number types
-class AcanthisNumber extends AcanthisType<num> {
-  const AcanthisNumber({super.isAsync, super.operations});
-
+extension AcanthisNumberExt on AcanthisType<num> {
   /// Add a check to the number to check if it is less than or equal to [value]
-  AcanthisNumber lte(num value) {
+  AcanthisType<num> lte(num value) {
     return withCheck(NumericChecks.lte(value));
   }
 
   /// Add a check to the number to check if it is greater than or equal to [value]
-  AcanthisNumber gte(num value) {
+  AcanthisType<num> gte(num value) {
     return withCheck(NumericChecks.gte(value));
   }
 
-  AcanthisNumber between(num min, num max) {
+  AcanthisType<num> between(num min, num max) {
     return withCheck(
       NumericChecks.between(
         min: min,
@@ -30,94 +26,68 @@ class AcanthisNumber extends AcanthisType<num> {
   }
 
   /// Add a check to the number to check if it is greater than [value]
-  AcanthisNumber gt(num value) {
+  AcanthisType<num> gt(num value) {
     return withCheck(NumericChecks.gt(value));
   }
 
   /// Add a check to the number to check if it is less than [value]
-  AcanthisNumber lt(num value) {
+  AcanthisType<num> lt(num value) {
     return withCheck(NumericChecks.lt(value));
   }
 
   /// Add a check to the number to check if it is positive
-  AcanthisNumber positive() {
+  AcanthisType<num> positive() {
     return withCheck(NumericChecks.positive);
   }
 
   /// Add a check to the number to check if it is negative
-  AcanthisNumber negative() {
+  AcanthisType<num> negative() {
     return withCheck(NumericChecks.negative);
   }
 
   /// Add a check to the number to check if it is an integer
-  AcanthisNumber integer() {
+  AcanthisType<num> integer() {
     return withCheck(NumericChecks.int);
   }
 
   /// Add a check to the number to check if it is a double
-  AcanthisNumber double() {
+  AcanthisType<num> double() {
     return withCheck(NumericChecks.double);
   }
 
   /// Add a check to the number to check if it is a multiple of [value]
-  AcanthisNumber multipleOf(int value) {
+  AcanthisType<num> multipleOf(int value) {
     return withCheck(NumericChecks.multipleOf(value));
   }
 
   /// Add a check to the number to check if it is finite
-  AcanthisNumber finite() {
+  AcanthisType<num> finite() {
     return withCheck(NumericChecks.finite);
   }
 
   /// Add a check to the number to check if it is infinite
-  AcanthisNumber infinite() {
+  AcanthisType<num> infinite() {
     return withCheck(NumericChecks.infinite);
   }
 
   /// Add a check to the number to check if it is "not a number"
-  AcanthisNumber nan() {
+  AcanthisType<num> nan() {
     return withCheck(NumericChecks.nan);
   }
 
   /// Add a check to the number to check if it is not "not a number"
-  AcanthisNumber notNaN() {
+  AcanthisType<num> notNaN() {
     return withCheck(NumericChecks.notNaN);
   }
 
-  /// Create a list of numbers
-  AcanthisList<num> list() {
-    return AcanthisList<num>(this);
-  }
-
   /// Transform the number to a power of [value]
-  AcanthisNumber pow(num value) {
+  AcanthisType<num> pow(num value) {
     return withTransformation(NumericTransforms.pow(value));
-  }
-
-  /// Create a union from the number
-  AcanthisUnion or(List<AcanthisType> elements) {
-    return AcanthisUnion([this, ...elements]);
-  }
-
-  @override
-  AcanthisNumber withAsyncCheck(BaseAcanthisAsyncCheck<num> check) {
-    return AcanthisNumber(operations: operations.add(check), isAsync: true);
-  }
-
-  @override
-  AcanthisNumber withCheck(BaseAcanthisCheck<num> check) {
-    return AcanthisNumber(operations: operations.add(check));
-  }
-
-  @override
-  AcanthisNumber withTransformation(
-      BaseAcanthisTransformation<num> transformation) {
-    return AcanthisNumber(operations: operations.add(transformation));
   }
 }
 
 /// Create a number type
-AcanthisNumber number() => AcanthisNumber();
+AcanthisType<num> number() => AcanthisType<num>();
 
 abstract class NumericChecks extends BaseAcanthisCheck<num> {
   const NumericChecks();

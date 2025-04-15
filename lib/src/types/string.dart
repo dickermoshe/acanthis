@@ -6,31 +6,29 @@ import 'package:crypto/crypto.dart';
 import 'package:email_validator/email_validator.dart';
 
 /// A class to validate string types
-class AcanthisString extends AcanthisType<String> {
-  const AcanthisString({super.isAsync, super.operations});
-
+extension AcanthisStringExt on AcanthisType<String> {
   /// Add a check to the string to check if it is a valid email
-  AcanthisString email() {
+  AcanthisType<String> email() {
     return withCheck(StringChecks.email);
   }
 
   /// Add a check to the string to check if its length is at least [length]
-  AcanthisString min(int length) {
+  AcanthisType<String> min(int length) {
     return withCheck(StringChecks.min(length));
   }
 
   /// Add a check to the string to check if its length is at most [length]
-  AcanthisString max(int length) {
+  AcanthisType<String> max(int length) {
     return withCheck(StringChecks.max(length));
   }
 
   /// Add a check to the string to check if follows the pattern [pattern]
-  AcanthisString pattern(RegExp pattern) {
+  AcanthisType<String> pattern(RegExp pattern) {
     return withCheck(StringChecks.pattern(pattern));
   }
 
   /// Add a check to the string to check if it contains letters
-  AcanthisString letters({bool strict = true}) {
+  AcanthisType<String> letters({bool strict = true}) {
     return withCheck(switch (strict) {
       true => StringChecks.strictLetters,
       false => StringChecks.letters,
@@ -38,7 +36,7 @@ class AcanthisString extends AcanthisType<String> {
   }
 
   /// Add a check to the string to check if it contains digits
-  AcanthisString digits({bool strict = true}) {
+  AcanthisType<String> digits({bool strict = true}) {
     return withCheck(switch (strict) {
       true => StringChecks.strictDigits,
       false => StringChecks.digits
@@ -46,7 +44,7 @@ class AcanthisString extends AcanthisType<String> {
   }
 
   /// Add a check to the string to check if it contains alphanumeric characters
-  AcanthisString alphanumeric({bool strict = true}) {
+  AcanthisType<String> alphanumeric({bool strict = true}) {
     return withCheck(switch (strict) {
       true => StringChecks.strictAlphanumeric,
       false => StringChecks.alphanumeric
@@ -54,7 +52,7 @@ class AcanthisString extends AcanthisType<String> {
   }
 
   /// Add a check to the string to check if it contains alphanumeric characters and spaces
-  AcanthisString alphanumericWithSpaces({bool strict = true}) {
+  AcanthisType<String> alphanumericWithSpaces({bool strict = true}) {
     return withCheck(switch (strict) {
       true => StringChecks.strictAlphanumericWithSpaces,
       false => StringChecks.alphanumericWithSpaces,
@@ -62,7 +60,7 @@ class AcanthisString extends AcanthisType<String> {
   }
 
   /// Add a check to the string to check if it contains special characters
-  AcanthisString specialCharacters({bool strict = true}) {
+  AcanthisType<String> specialCharacters({bool strict = true}) {
     return withCheck(switch (strict) {
       true => StringChecks.strictSpecialCharacters,
       false => StringChecks.specialCharacters
@@ -70,7 +68,7 @@ class AcanthisString extends AcanthisType<String> {
   }
 
   /// Add a check to the string to check if it contains all characters
-  AcanthisString allCharacters({bool strict = true}) {
+  AcanthisType<String> allCharacters({bool strict = true}) {
     return withCheck(switch (strict) {
       true => StringChecks.strictAllCharacters,
       false => StringChecks.allCharacters
@@ -78,157 +76,131 @@ class AcanthisString extends AcanthisType<String> {
   }
 
   /// Add a check to the string to check if it is in uppercase
-  AcanthisString upperCase() {
+  AcanthisType<String> upperCase() {
     return withCheck(StringChecks.upperCase);
   }
 
   /// Add a check to the string to check if it is in lowercase
-  AcanthisString lowerCase() {
+  AcanthisType<String> lowerCase() {
     return withCheck(StringChecks.lowerCase);
   }
 
   /// Add a check to the string to check if it is in mixed case
-  AcanthisString mixedCase() {
+  AcanthisType<String> mixedCase() {
     return withCheck(StringChecks.mixedCase);
   }
 
   /// Add a check to the string to check if it is a valid date time
-  AcanthisString dateTime() {
+  AcanthisType<String> dateTime() {
     return withCheck(StringChecks.dateTime);
   }
 
-  AcanthisString time() {
+  AcanthisType<String> time() {
     return withCheck(StringChecks.time);
   }
 
-  AcanthisString hexColor() {
+  AcanthisType<String> hexColor() {
     return withCheck(StringChecks.hexColor);
   }
 
   /// Add a check to the string to check if it is a valid uri
-  AcanthisString uri() {
+  AcanthisType<String> uri() {
     return withCheck(StringChecks.uri);
   }
 
-  AcanthisString url() {
+  AcanthisType<String> url() {
     return withCheck(StringChecks.url);
   }
 
-  AcanthisString uncompromised() {
+  AcanthisType<String> uncompromised() {
     return withAsyncCheck(StringChecks.uncompromised);
   }
 
   /// Add a check to the string to check if it is not empty
-  AcanthisString required() {
+  AcanthisType<String> required() {
     return withCheck(StringChecks.required);
   }
 
   /// Add a check to the string to check if it's length is exactly [length]
-  AcanthisString length(int length) {
+  AcanthisType<String> length(int length) {
     return withCheck(StringChecks.length(length));
   }
 
   /// Add a check to the string to check if it contains [value]
-  AcanthisString contains(String value) {
+  AcanthisType<String> contains(String value) {
     return withCheck(StringChecks.contains(value));
   }
 
   /// Add a check to the string to check if it starts with [value]
-  AcanthisString startsWith(String value) {
+  AcanthisType<String> startsWith(String value) {
     return withCheck(StringChecks.startsWith(value));
   }
 
   /// Add a check to the string to check if it ends with [value]
-  AcanthisString endsWith(String value) {
+  AcanthisType<String> endsWith(String value) {
     return withCheck(StringChecks.endsWith(value));
   }
 
-  AcanthisString card() {
+  AcanthisType<String> card() {
     return withCheck(StringChecks.card);
   }
 
-  AcanthisString cuid() {
+  AcanthisType<String> cuid() {
     return withCheck(StringChecks.cuid);
   }
 
-  AcanthisString cuid2() {
+  AcanthisType<String> cuid2() {
     return withCheck(StringChecks.cuid2);
   }
 
-  AcanthisString ulid() {
+  AcanthisType<String> ulid() {
     return withCheck(StringChecks.ulid);
   }
 
-  AcanthisString uuid() {
+  AcanthisType<String> uuid() {
     return withCheck(StringChecks.uuid);
   }
 
-  AcanthisString nanoid() {
+  AcanthisType<String> nanoid() {
     return withCheck(StringChecks.nanoid);
   }
 
-  AcanthisString jwt() {
+  AcanthisType<String> jwt() {
     return withCheck(StringChecks.jwt);
   }
 
-  AcanthisString base64() {
+  AcanthisType<String> base64() {
     return withCheck(StringChecks.base64);
   }
 
-  /// Create a list of strings
-  AcanthisList<String> list() {
-    return AcanthisList<String>(this);
-  }
-
   /// Add a transformation to the string to encode it to base64
-  AcanthisString encode() {
+  AcanthisType<String> encode() {
     return withTransformation(StringTransforms.base64Encode);
   }
 
   /// Add a transformation to the string to decode it from base64
-  AcanthisString decode() {
+  AcanthisType<String> decode() {
     return withTransformation(StringTransforms.base64Decode);
   }
 
   /// Add a transformation to the string to transform it to uppercase
-  AcanthisString toUpperCase() {
+  AcanthisType<String> toUpperCase() {
     return withTransformation(StringTransforms.toUpperCase);
   }
 
   /// Add a transformation to the string to transform it to lowercase
-  AcanthisString toLowerCase() {
+  AcanthisType<String> toLowerCase() {
     return withTransformation(StringTransforms.toLowerCase);
-  }
-
-  /// Create a union from the string
-  AcanthisUnion or(List<AcanthisType> elements) {
-    return AcanthisUnion([this, ...elements]);
   }
 
   // AcanthisDate date() {
   //   addTransformation(AcanthisTransformation(transformation: (value) => DateTime.parse(value)));
   //   return AcanthisDate();
   // }
-
-  @override
-  AcanthisString withAsyncCheck(BaseAcanthisAsyncCheck<String> check) {
-    return AcanthisString(operations: operations.add(check), isAsync: true);
-  }
-
-  @override
-  AcanthisString withCheck(BaseAcanthisCheck<String> check) {
-    return AcanthisString(operations: operations.add(check));
-  }
-
-  @override
-  AcanthisString withTransformation(
-      BaseAcanthisTransformation<String> transformation) {
-    return AcanthisString(operations: operations.add(transformation));
-  }
 }
 
-/// Create a new AcanthisString instance
-AcanthisString string() => AcanthisString();
+/// Create a new AcanthisType\<String> instance
+AcanthisType<String> string() => AcanthisType<String>();
 
 // Checks for Strings
 

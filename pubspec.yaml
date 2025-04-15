@@ -20,7 +20,6 @@ environment:
 dependencies:
   email_validator: ^3.0.0
   crypto: ^3.0.0
-  fast_immutable_collections: ^11.0.0
   meta: ^1.15.0
 
 dev_dependencies:

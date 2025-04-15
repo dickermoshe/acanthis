@@ -4,9 +4,9 @@ import 'package:acanthis/src/types/string.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('$AcanthisString', () {
+  group('$AcanthisType<String> ', () {
     test("Can be created using `const`", () {
-      const AcanthisString();
+      const AcanthisType<String>();
     });
 
     test(

@@ -55,7 +55,7 @@ class AcanthisUnion extends AcanthisType<dynamic> {
   AcanthisUnion withAsyncCheck(BaseAcanthisAsyncCheck check) {
     return AcanthisUnion(
       elements,
-      operations: operations.add(check),
+      operations: [...operations, check],
       isAsync: true,
     );
   }
@@ -64,7 +64,7 @@ class AcanthisUnion extends AcanthisType<dynamic> {
   AcanthisUnion withCheck(BaseAcanthisCheck check) {
     return AcanthisUnion(
       elements,
-      operations: operations.add(check),
+      operations: [...operations, check],
     );
   }
 
@@ -72,7 +72,7 @@ class AcanthisUnion extends AcanthisType<dynamic> {
   AcanthisUnion withTransformation(BaseAcanthisTransformation transformation) {
     return AcanthisUnion(
       elements,
-      operations: operations.add(transformation),
+      operations: [...operations, transformation],
     );
   }
 }

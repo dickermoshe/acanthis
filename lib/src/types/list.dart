@@ -4,14 +4,14 @@ import 'types.dart';
 
 /// A class to validate list types
 class AcanthisList<T> extends AcanthisType<List<T>> {
-  final AcanthisType<T> element;
+  final AcanthisType<T> _element;
 
-  const AcanthisList(this.element, {super.operations, super.isAsync});
+  const AcanthisList(this._element, {super.operations, super.isAsync});
 
   List<T> _parse(List<T> value) {
     final parsed = <T>[];
     for (var i = 0; i < value.length; i++) {
-      final parsedElement = element.parse(value[i]);
+      final parsedElement = _element.parse(value[i]);
       parsed.add(parsedElement.value);
     }
     final result = super.parse(value);
@@ -22,7 +22,7 @@ class AcanthisList<T> extends AcanthisType<List<T>> {
     final parsed = <T>[];
     final errors = <String, dynamic>{};
     for (var i = 0; i < value.length; i++) {
-      final parsedElement = element.tryParse(value[i]);
+      final parsedElement = _element.tryParse(value[i]);
       parsed.add(parsedElement.value);
       if (parsedElement.errors.isNotEmpty) {
         errors[i.toString()] = parsedElement.errors;
@@ -36,7 +36,7 @@ class AcanthisList<T> extends AcanthisType<List<T>> {
   Future<AcanthisParseResult<List<T>>> parseAsync(List<T> value) async {
     final parsed = <T>[];
     for (var i = 0; i < value.length; i++) {
-      final parsedElement = await element.parseAsync(value[i]);
+      final parsedElement = await _element.parseAsync(value[i]);
       parsed.add(parsedElement.value);
     }
     final result = await super.parseAsync(value);
@@ -48,7 +48,7 @@ class AcanthisList<T> extends AcanthisType<List<T>> {
     final parsed = <T>[];
     final errors = <String, dynamic>{};
     for (var i = 0; i < value.length; i++) {
-      final parsedElement = await element.tryParseAsync(value[i]);
+      final parsedElement = await _element.tryParseAsync(value[i]);
       parsed.add(parsedElement.value);
       if (parsedElement.errors.isNotEmpty) {
         errors[i.toString()] = parsedElement.errors;
@@ -91,43 +91,11 @@ class AcanthisList<T> extends AcanthisType<List<T>> {
     return results.every((element) => element);
   }
 
-  /// Add a check to the list to check if it is at least [length] elements long
-  AcanthisList<T> min(int length) {
-    return withCheck(ListChecks.min(length));
-  }
-
-  /// Add a check to the list to check if it contains at least one of the [values]
-  AcanthisList<T> anyOf(List<T> values) {
-    return withCheck(ListChecks.anyOf(values));
-  }
-
-  /// Add a check to the list to check if it contains all of the [values]
-  AcanthisList<T> everyOf(List<T> values) {
-    return withCheck(ListChecks.everyOf(values));
-  }
-
-  /// Add a check to the list to check if it is at most [length] elements long
-  AcanthisList<T> max(int length) {
-    return withCheck(ListChecks.max(length));
-  }
-
-  /// Add a check to the list to check if all elements are unique
-  ///
-  /// In Zod is the same as creating a set.
-  AcanthisList<T> unique() {
-    return withCheck(ListChecks.unique());
-  }
-
-  /// Add a check to the list to check if it has exactly [value] elements
-  AcanthisList<T> length(int value) {
-    return withCheck(ListChecks.length(value));
-  }
-
   @override
   AcanthisList<T> withAsyncCheck(BaseAcanthisAsyncCheck<List<T>> check) {
     return AcanthisList(
-      element,
-      operations: operations.add(check),
+      _element,
+      operations: [...operations, check],
       isAsync: true,
     );
   }
@@ -135,8 +103,8 @@ class AcanthisList<T> extends AcanthisType<List<T>> {
   @override
   AcanthisList<T> withCheck(BaseAcanthisCheck<List<T>> check) {
     return AcanthisList(
-      element,
-      operations: operations.add(check),
+      _element,
+      operations: [...operations, check],
     );
   }
 
@@ -144,9 +112,43 @@ class AcanthisList<T> extends AcanthisType<List<T>> {
   AcanthisList<T> withTransformation(
       BaseAcanthisTransformation<List<T>> transformation) {
     return AcanthisList(
-      element,
-      operations: operations.add(transformation),
+      _element,
+      operations: [...operations, transformation],
     );
+  }
+}
+
+extension AcanthisListExt<T> on AcanthisType<List<T>> {
+  /// Add a check to the list to check if it is at least [length] elements long
+  AcanthisType<List<T>> min(int length) {
+    return withCheck(ListChecks.min(length));
+  }
+
+  /// Add a check to the list to check if it contains at least one of the [values]
+  AcanthisType<List<T>> anyOf(List<T> values) {
+    return withCheck(ListChecks.anyOf(values));
+  }
+
+  /// Add a check to the list to check if it contains all of the [values]
+  AcanthisType<List<T>> everyOf(List<T> values) {
+    return withCheck(ListChecks.everyOf(values));
+  }
+
+  /// Add a check to the list to check if it is at most [length] elements long
+  AcanthisType<List<T>> max(int length) {
+    return withCheck(ListChecks.max(length));
+  }
+
+  /// Add a check to the list to check if all elements are unique
+  ///
+  /// In Zod is the same as creating a set.
+  AcanthisType<List<T>> unique() {
+    return withCheck(ListChecks.unique());
+  }
+
+  /// Add a check to the list to check if it has exactly [value] elements
+  AcanthisType<List<T>> length(int value) {
+    return withCheck(ListChecks.length(value));
   }
 }
 

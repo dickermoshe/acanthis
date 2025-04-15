@@ -4,9 +4,9 @@ import 'package:test/test.dart';
 import 'package:acanthis/acanthis.dart' as acanthis;
 
 void main() {
-  group('$AcanthisNumber', () {
+  group('$AcanthisType<num> ', () {
     test("Can be created using `const`", () {
-      const AcanthisNumber();
+      const AcanthisType<num>();
     });
     test(
         'when creating a number validator,'
