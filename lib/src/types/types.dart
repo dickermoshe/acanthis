@@ -13,10 +13,10 @@ import 'nullable.dart';
 class AcanthisType<O> {
   /// The operations that the type should perform
   @internal
-  UnmodifiableListView<AcanthisOperation> get operations =>
+  UnmodifiableListView<AcanthisOperation<O>> get operations =>
       UnmodifiableListView(__operations);
 
-  final List<AcanthisOperation> __operations;
+  final List<AcanthisOperation<O>> __operations;
 
   @internal
   final bool isAsync;
@@ -24,7 +24,7 @@ class AcanthisType<O> {
   /// The constructor of the class
   @internal
   const AcanthisType(
-      {List<AcanthisOperation> operations = const [], this.isAsync = false})
+      {List<AcanthisOperation<O>> operations = const [], this.isAsync = false})
       : __operations = operations;
 
   /// The parse method to parse the value
@@ -36,12 +36,12 @@ class AcanthisType<O> {
     }
     O newValue = value;
     for (var operation in operations) {
-      if (operation is BaseAcanthisCheck) {
+      if (operation case BaseAcanthisCheck<O> operation) {
         if (!operation(newValue)) {
           throw ValidationError(operation.error);
         }
       }
-      if (operation is BaseAcanthisTransformation) {
+      if (operation case BaseAcanthisTransformation<O> operation) {
         newValue = operation(newValue);
       }
     }
@@ -62,12 +62,12 @@ class AcanthisType<O> {
     final errors = <String, String>{};
     O newValue = value;
     for (var operation in operations) {
-      if (operation is BaseAcanthisCheck) {
+      if (operation case BaseAcanthisCheck<O> operation) {
         if (!operation(newValue)) {
           errors[operation.name] = operation.error;
         }
       }
-      if (operation is BaseAcanthisTransformation) {
+      if (operation case BaseAcanthisTransformation<O> operation) {
         newValue = operation(newValue);
       }
     }
@@ -80,17 +80,17 @@ class AcanthisType<O> {
   Future<AcanthisParseResult<O>> parseAsync(O value) async {
     O newValue = value;
     for (var operation in operations) {
-      if (operation is BaseAcanthisCheck) {
+      if (operation case BaseAcanthisCheck<O> operation) {
         if (!operation(newValue)) {
           throw ValidationError(operation.error);
         }
       }
-      if (operation is BaseAcanthisAsyncCheck) {
+      if (operation case BaseAcanthisAsyncCheck<O> operation) {
         if (!await operation(newValue)) {
           throw ValidationError(operation.error);
         }
       }
-      if (operation is BaseAcanthisTransformation) {
+      if (operation case BaseAcanthisTransformation<O> operation) {
         newValue = operation(newValue);
       }
     }
@@ -107,17 +107,17 @@ class AcanthisType<O> {
     final errors = <String, String>{};
     O newValue = value;
     for (var operation in operations) {
-      if (operation is BaseAcanthisCheck) {
+      if (operation case BaseAcanthisCheck<O> operation) {
         if (!operation(newValue)) {
           errors[operation.name] = operation.error;
         }
       }
-      if (operation is BaseAcanthisAsyncCheck) {
+      if (operation case BaseAcanthisAsyncCheck<O> operation) {
         if (!await operation(newValue)) {
           errors[operation.name] = operation.error;
         }
       }
-      if (operation is BaseAcanthisTransformation) {
+      if (operation case BaseAcanthisTransformation<O> operation) {
         newValue = operation(newValue);
       }
     }
