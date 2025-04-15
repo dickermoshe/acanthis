@@ -346,9 +346,16 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
   }
 
   /// Add field(s) to the map
+  /// It won't overwrite existing fields
   AcanthisMap<V> extend(Map<String, AcanthisType> fields) {
+    final newFields = <String, AcanthisType>{};
+    for (var field in fields.keys) {
+      if (!_fields.containsKey(field)) {
+        newFields[field] = fields[field]!;
+      }
+    }
     return AcanthisMap<V>._(
-      fields: {..._fields, ...fields},
+      fields: {..._fields, ...newFields},
       passthrough: _passthrough,
       dependencies: _dependencies,
       optionalFields: _optionalFields,
@@ -360,7 +367,14 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
   /// Merge field(s) to the map
   /// if a field already exists, it will be overwritten
   AcanthisMap<V> merge(Map<String, AcanthisType> fields) {
-    return extend(fields);
+    return AcanthisMap<V>._(
+      fields: _fields.addAll(fields.toIMap()),
+      passthrough: _passthrough,
+      dependencies: _dependencies,
+      optionalFields: _optionalFields,
+      operations: operations,
+      isAsync: isAsync,
+    );
   }
 
   /// Pick field(s) from the map

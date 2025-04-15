@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+- fix: `AcanthisMap.extend` method now does not override existing key-value pairs. [#7](https://github.com/avesbox/acanthis/pull/7) by [francescovallone](https://github.com/francescovallone)
+- refactor: codebase is now immutable. [#6](https://github.com/avesbox/acanthis/pull/6) by [dickermoshe](https://github.com/dickermoshe)
+
 ## 1.0.2
 
 - Add `differsFromNow` to the `AcanthisDate` validator.
