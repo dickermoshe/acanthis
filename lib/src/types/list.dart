@@ -230,7 +230,7 @@ class _EveryOfCheck<T> extends ListChecks<T> {
   @override
   String get error => 'The list must have all of the values in $values';
   @override
-  String get name => 'allOf';
+  String get name => 'everyOf';
 }
 
 class _AnyOfCheck<T> extends ListChecks<T> {
