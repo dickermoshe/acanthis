@@ -10,7 +10,8 @@ import 'types.dart';
 /// A class to validate map types
 class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
   final Map<String, AcanthisType> __fields;
-  Map<String, AcanthisType> get _fields => UnmodifiableMapView(__fields);
+  @visibleForTesting
+  Map<String, AcanthisType> get fields => UnmodifiableMapView(__fields);
 
   final bool _passthrough;
   final List<_Dependency> __dependencies;
@@ -39,23 +40,23 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
 
   Map<String, V> _parse(Map<String, V> value) {
     final parsed = <String, V>{};
-    if (!_fields.keys.every((element) => value.containsKey(element))) {
-      for (var field in _fields.keys) {
+    if (!fields.keys.every((element) => value.containsKey(element))) {
+      for (var field in fields.keys) {
         if (!value.containsKey(field)) {
           throw ValidationError('Field $field is required');
         }
       }
     }
     for (var obj in value.entries) {
-      if (!_fields.containsKey(obj.key)) {
+      if (!fields.containsKey(obj.key)) {
         if (_passthrough) {
           parsed[obj.key] = obj.value;
           continue;
         }
         throw ValidationError('Field ${obj.key} is not allowed in this object');
       }
-      if (_fields[obj.key] is LazyEntry) {
-        final type = (_fields[obj.key] as LazyEntry).call(this);
+      if (fields[obj.key] is LazyEntry) {
+        final type = (fields[obj.key] as LazyEntry).call(this);
         if (obj.value is List) {
           parsed[obj.key] = type
               .parse(List<Map<String, dynamic>>.from(obj.value as List))
@@ -64,7 +65,7 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
           parsed[obj.key] = type.parse(obj.value).value;
         }
       } else {
-        parsed[obj.key] = _fields[obj.key]!.parse(obj.value).value;
+        parsed[obj.key] = fields[obj.key]!.parse(obj.value).value;
       }
     }
     for (var dependency in _dependencies) {
@@ -86,15 +87,15 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
 
   Future<Map<String, V>> _asyncParse(Map<String, V> value) async {
     final parsed = <String, V>{};
-    if (!_fields.keys.every((element) => value.containsKey(element))) {
-      for (var field in _fields.keys) {
+    if (!fields.keys.every((element) => value.containsKey(element))) {
+      for (var field in fields.keys) {
         if (!value.containsKey(field)) {
           throw ValidationError('Field $field is required');
         }
       }
     }
     for (var obj in value.entries) {
-      if (!_fields.containsKey(obj.key)) {
+      if (!fields.containsKey(obj.key)) {
         if (_passthrough) {
           parsed[obj.key] = obj.value;
           continue;
@@ -102,8 +103,8 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
         throw ValidationError('Field ${obj.key} is not allowed in this object');
       }
       final dynamic result;
-      if (_fields[obj.key] is LazyEntry) {
-        final type = (_fields[obj.key] as LazyEntry).call(this);
+      if (fields[obj.key] is LazyEntry) {
+        final type = (fields[obj.key] as LazyEntry).call(this);
         if (obj.value is List) {
           result = type
               .parseAsync(List<Map<String, dynamic>>.from(obj.value as List));
@@ -111,7 +112,7 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
           result = type.parseAsync(obj.value);
         }
       } else {
-        result = await _fields[obj.key]!.parseAsync(obj.value);
+        result = await fields[obj.key]!.parseAsync(obj.value);
       }
       parsed[obj.key] = result.value;
     }
@@ -136,16 +137,16 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
       Map<String, V> value) {
     final parsed = <String, V>{};
     final errors = <String, dynamic>{};
-    if (!_fields.keys.every((element) =>
+    if (!fields.keys.every((element) =>
         value.containsKey(element) || _optionalFields.contains(element))) {
-      for (var field in _fields.keys) {
+      for (var field in fields.keys) {
         if (!value.containsKey(field)) {
           errors[field] = {'required': 'Field is required'};
         }
       }
     }
     for (var obj in value.entries) {
-      if (!_fields.containsKey(obj.key)) {
+      if (!fields.containsKey(obj.key)) {
         if (_passthrough) {
           parsed[obj.key] = obj.value;
         } else {
@@ -156,8 +157,8 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
         continue;
       }
       final AcanthisParseResult<dynamic> parsedValue;
-      if (_fields[obj.key] is LazyEntry) {
-        final type = (_fields[obj.key] as LazyEntry).call(this);
+      if (fields[obj.key] is LazyEntry) {
+        final type = (fields[obj.key] as LazyEntry).call(this);
         if (obj.value is List) {
           parsedValue =
               type.tryParse(List<Map<String, dynamic>>.from(obj.value as List));
@@ -165,7 +166,7 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
           parsedValue = type.tryParse(obj.value);
         }
       } else {
-        parsedValue = _fields[obj.key]!.tryParse(obj.value);
+        parsedValue = fields[obj.key]!.tryParse(obj.value);
       }
       parsed[obj.key] = parsedValue.value;
       errors[obj.key] = parsedValue.errors;
@@ -192,16 +193,16 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
       Map<String, V> value) async {
     final parsed = <String, V>{};
     final errors = <String, dynamic>{};
-    if (!_fields.keys.every((element) =>
+    if (!fields.keys.every((element) =>
         value.containsKey(element) || _optionalFields.contains(element))) {
-      for (var field in _fields.keys) {
+      for (var field in fields.keys) {
         if (!value.containsKey(field)) {
           errors[field] = {'required': 'Field is required'};
         }
       }
     }
     for (var obj in value.entries) {
-      if (!_fields.containsKey(obj.key)) {
+      if (!fields.containsKey(obj.key)) {
         if (_passthrough) {
           parsed[obj.key] = obj.value;
         } else {
@@ -212,8 +213,8 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
         continue;
       }
       final AcanthisParseResult parsedValue;
-      if (_fields[obj.key] is LazyEntry) {
-        final type = (_fields[obj.key] as LazyEntry).call(this);
+      if (fields[obj.key] is LazyEntry) {
+        final type = (fields[obj.key] as LazyEntry).call(this);
         if (obj.value is List) {
           parsedValue = await type.tryParseAsync(
               List<Map<String, dynamic>>.from(obj.value as List));
@@ -221,7 +222,7 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
           parsedValue = await type.tryParseAsync(obj.value);
         }
       } else {
-        parsedValue = await _fields[obj.key]!.tryParseAsync(obj.value);
+        parsedValue = await fields[obj.key]!.tryParseAsync(obj.value);
       }
       parsed[obj.key] = parsedValue.value;
       errors[obj.key] = parsedValue.errors;
@@ -264,12 +265,12 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
   /// Add optional fields to the map
   ///
   /// The optionals are valid only for the current layer of the object
-  AcanthisMap<V> optionals(List<String> fields) {
+  AcanthisMap<V> optionals(List<String> newOptionalFields) {
     return AcanthisMap<V>._(
-      fields: _fields,
+      fields: fields,
       passthrough: _passthrough,
       dependencies: _dependencies,
-      optionalFields: [..._optionalFields, ...fields],
+      optionalFields: [..._optionalFields, ...newOptionalFields],
       operations: operations,
       isAsync: isAsync,
     );
@@ -323,7 +324,7 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
     required bool Function(dynamic, dynamic) dependency,
   }) {
     return AcanthisMap<V>._(
-      fields: _fields,
+      fields: fields,
       passthrough: _passthrough,
       dependencies: [
         ..._dependencies,
@@ -347,15 +348,15 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
 
   /// Add field(s) to the map
   /// It won't overwrite existing fields
-  AcanthisMap<V> extend(Map<String, AcanthisType> fields) {
-    final newFields = <String, AcanthisType>{};
-    for (var field in fields.keys) {
-      if (!_fields.containsKey(field)) {
-        newFields[field] = fields[field]!;
+  AcanthisMap<V> extend(Map<String, AcanthisType> newFields) {
+    final filteredNewFields = <String, AcanthisType>{};
+    for (var field in newFields.keys) {
+      if (!fields.containsKey(field)) {
+        filteredNewFields[field] = newFields[field]!;
       }
     }
     return AcanthisMap<V>._(
-      fields: {..._fields, ...newFields},
+      fields: {...fields, ...filteredNewFields},
       passthrough: _passthrough,
       dependencies: _dependencies,
       optionalFields: _optionalFields,
@@ -366,9 +367,9 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
 
   /// Merge field(s) to the map
   /// if a field already exists, it will be overwritten
-  AcanthisMap<V> merge(Map<String, AcanthisType> fields) {
+  AcanthisMap<V> merge(Map<String, AcanthisType> newFields) {
     return AcanthisMap<V>._(
-      fields: _fields.addAll(fields.toIMap()),
+      fields: {...fields, ...newFields},
       passthrough: _passthrough,
       dependencies: _dependencies,
       optionalFields: _optionalFields,
@@ -378,11 +379,11 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
   }
 
   /// Pick field(s) from the map
-  AcanthisMap<V> pick(Iterable<String> fields) {
+  AcanthisMap<V> pick(Iterable<String> pickedFields) {
     final newFields = <String, AcanthisType>{};
-    for (var field in fields) {
-      if (_fields.containsKey(field)) {
-        newFields[field] = _fields[field]!;
+    for (var field in pickedFields) {
+      if (fields.containsKey(field)) {
+        newFields[field] = fields[field]!;
       }
     }
     return AcanthisMap<V>._(
@@ -398,9 +399,9 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
   /// Omit field(s) from the map
   AcanthisMap<V> omit(Iterable<String> toOmit) {
     final newFields = <String, AcanthisType>{};
-    for (var field in _fields.keys) {
+    for (var field in fields.keys) {
       if (!toOmit.contains(field)) {
-        newFields[field] = _fields[field]!;
+        newFields[field] = fields[field]!;
       }
     }
     return AcanthisMap<V>._(
@@ -416,7 +417,7 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
   /// Allow unknown keys in the map
   AcanthisMap<V> passthrough() {
     return AcanthisMap<V>._(
-      fields: _fields,
+      fields: fields,
       passthrough: true,
       dependencies: _dependencies,
       optionalFields: _optionalFields,
@@ -427,7 +428,7 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
 
   AcanthisMap<V?> partial({bool deep = false}) {
     if (deep) {
-      return AcanthisMap<V?>(_fields.map((key, value) {
+      return AcanthisMap<V?>(fields.map((key, value) {
         if (value is AcanthisMap) {
           return MapEntry(key, value.partial(deep: deep));
         }
@@ -438,13 +439,13 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
       }));
     }
     return AcanthisMap<V?>(
-        _fields.map((key, value) => MapEntry(key, value.nullable())));
+        fields.map((key, value) => MapEntry(key, value.nullable())));
   }
 
   @override
   AcanthisMap<V> withAsyncCheck(BaseAcanthisAsyncCheck<Map<String, V>> check) {
     return AcanthisMap<V>._(
-      fields: _fields,
+      fields: fields,
       passthrough: _passthrough,
       dependencies: _dependencies,
       optionalFields: _optionalFields,
@@ -456,7 +457,7 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
   @override
   AcanthisMap<V> withCheck(BaseAcanthisCheck<Map<String, V>> check) {
     return AcanthisMap<V>._(
-      fields: _fields,
+      fields: fields,
       passthrough: _passthrough,
       dependencies: _dependencies,
       optionalFields: _optionalFields,
@@ -469,7 +470,7 @@ class AcanthisMap<V> extends AcanthisType<Map<String, V>> {
   AcanthisMap<V> withTransformation(
       BaseAcanthisTransformation<Map<String, V>> transformation) {
     return AcanthisMap<V>._(
-      fields: _fields,
+      fields: fields,
       passthrough: _passthrough,
       dependencies: _dependencies,
       optionalFields: _optionalFields,
